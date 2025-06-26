@@ -15,6 +15,10 @@ public class Spots {
     @Column(nullable = false) //spot status cannot be null
     private String status = "empty"; // default status 
     private String locationDescription;
+    @Column(nullable = false) //coordinates cannot be null
+    private int x = 0; //default x coordinate
+    @Column(nullable = false) 
+    private int y = 0; //default y coordinate
     @Column(nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
     @Column(nullable = false) //created time cannot be null
@@ -51,6 +55,22 @@ public class Spots {
 
     public void setLocationDescription(String locationDescription) {
         this.locationDescription = locationDescription;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public Boolean getIsReservable() {
