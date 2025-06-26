@@ -5,20 +5,18 @@ import jakarta.persistence.*;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "users") //specifies the name of the table in the database
-public class User {
+public class Users {
     //declare variables
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userID;
+    private int userID; //unique identifier for the user
     @Column(nullable = false, unique = true) //email must be unique and cannot be null
     private String email;
-    @Column(nullable = false) //password cannot be null
-    private String password;
-    @Column(nullable = false) //full name cannot be null
-    private String fullName;
+    @Column(nullable = false) //password and full name cannot be null
+    private String password, fullName;
     @Column(nullable = false) //user type cannot be null
     private String userType = "USER"; // default user type
-    @Column(nullable = false)
+    @Column(nullable = false) //created time cannot be null
     private LocalDateTime created; //current time stamp
 
     //getters and setters
@@ -84,5 +82,4 @@ public class User {
                 ", Type: " + userType +
                 ", Created: " + created; 
     }
-}//class
-
+}//users class
