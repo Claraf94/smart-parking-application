@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/spots")
+//This controller handles requests related to parking spots, such as registering new spots, finding spots by status or code, and retrieving all spots.
 public class SpotsController {
     @Autowired
     private SpotsService spotsService;

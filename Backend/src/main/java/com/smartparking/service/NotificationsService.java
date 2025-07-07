@@ -24,6 +24,10 @@ public class NotificationsService{
 
     //personalized notification for user
     public Notifications createNotificationForUser(Users user, NotificationType type){
+        if(user == null || type == null) {
+            throw new IllegalArgumentException("User and NotificationType must not be null");
+        }
+        
         String message = "";
         switch (type) {
             case SPOT_NOT_AVAILABLE:

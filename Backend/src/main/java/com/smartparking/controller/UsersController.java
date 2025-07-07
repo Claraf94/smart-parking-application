@@ -15,6 +15,7 @@ import com.smartparking.service.UsersService;
 
 @RestController
 @RequestMapping("/users")
+//this controller handles all operations related to users, including registration, retrieval by email, and checking if an email exists.
 public class UsersController {
     @Autowired
     private UsersService usersService;

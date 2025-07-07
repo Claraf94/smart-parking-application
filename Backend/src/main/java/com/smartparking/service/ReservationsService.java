@@ -14,8 +14,8 @@ import com.smartparking.repository.ReservationsRepository;
 public class ReservationsService {
     @Autowired
     private ReservationsRepository reservationsRepository;
-    //verify if a reservation exists by using the Spots entity reference and the start and end times
-    public Reservations saveReservation(Reservations reservation) {
+    //verify if a reservation exists before creating it by using the Spots entity reference and the start and end times
+    public Reservations createReservation(Reservations reservation) {
         boolean exists = reservationsRepository.existsBySpotAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
             reservation.getSpot(), 
             reservation.getStartTime(), 

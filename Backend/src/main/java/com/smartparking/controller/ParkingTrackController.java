@@ -17,6 +17,7 @@ import com.smartparking.service.ParkingTrackService;
 
 @RestController
 @RequestMapping("/parkingTrack")
+//this controller handles parking track operations such as checking in and out of parking spots, retrieving user and spot activities, and managing parking status.
 public class ParkingTrackController {
     @Autowired
     private ParkingTrackService parkingTrackService;
@@ -35,7 +36,6 @@ public class ParkingTrackController {
     //returns every activity made by a specific user by its ID
     @GetMapping("/user/{userId}")
     public List<ParkingTrack> getByUser(@PathVariable int userId){
-        //create a new object user
         Users user = new Users();
         user.setUserID(userId);
         return parkingTrackService.getByUser(user);
@@ -43,9 +43,9 @@ public class ParkingTrackController {
     
     //returns parking activity for a specific spot by its ID
     @GetMapping("/spot/{spotId}")
-    public List<ParkingTrack> getBySpot(@PathVariable int spotId){
+    public List<ParkingTrack> getBySpot(@PathVariable int spotsId){
         Spots spot = new Spots();
-        spot.setSpotID(spotId);
+        spot.setSpotsID(spotsId);
         return parkingTrackService.getBySpot(spot);
     }
 
