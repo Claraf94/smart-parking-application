@@ -24,25 +24,25 @@ public class UsersController {
         return usersService.registerNewUser(user);
     }
 
-    //request to find a user by its email
+    //returns a user by its email
     @GetMapping("/findByEmail/{email}")
     public Optional<Users> findByEmail(@PathVariable String email) {
         return usersService.findByEmail(email);
     }
 
-    //request to check if an email exists
+    //checks if an email has already been registered
     @GetMapping("/emailExists/{email}")
     public boolean emailExists(@PathVariable String email) {
         return usersService.emailExists(email);
     }
     
-    //request to find users by their type
+    //returns users by its type
     @GetMapping("/findByUserType/{userType}")
     public List<Users> findByUserType(@PathVariable String userType) {
         return usersService.findByUserType(userType);
     }
 
-    //request to find all users
+    //returns all users (admin tool)
     @PreAuthorize("hasRole('ADMIN')") //only admin can access this endpoint
     @GetMapping("/findAll")
     public List<Users> findAll() {
