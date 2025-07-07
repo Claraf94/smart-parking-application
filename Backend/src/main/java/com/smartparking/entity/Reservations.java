@@ -110,7 +110,7 @@ public class Reservations {
         return "Reservation details:\n" +
                "Reservation ID: " + reservationID +
                ", User ID: " + user.getUserID() +
-               ", Spot ID: " + spot.getSpotID() +
+               ", Spot ID: " + spot.getSpotsID() +
                ", Phone Number: " + phoneNumber +
                ", Number Plate: " + numberPlate +
                ", Start Time: " + startTime +

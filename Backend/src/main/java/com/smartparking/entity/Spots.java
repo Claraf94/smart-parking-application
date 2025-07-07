@@ -9,7 +9,7 @@ public class Spots {
      //declare variables
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int spotID; //unique identifier for the parking spot
+    private int spotsID; //unique identifier for the parking spot
     @Column(nullable = false) //spot code cannot be null
     private String spotCode;
     @Column(nullable = false) //spot status cannot be null
@@ -25,12 +25,12 @@ public class Spots {
     private LocalDateTime created; //current time stamp
 
     //getters and setters
-    public int getSpotID() {
-        return spotID;
+    public int getSpotsID() {
+        return spotsID;
     }
 
-    public void setSpotID(int spotID) {
-        this.spotID = spotID;
+    public void setSpotsID(int spotsID) {
+        this.spotsID = spotsID;
     }
 
     public String getSpotCode() {
@@ -97,7 +97,7 @@ public class Spots {
     @Override
     public String toString() {
         return "Spot details:\n" +
-               "Spot ID: " + spotID +
+               "Spot ID: " + spotsID +
                ", Spot Code: " + spotCode +
                ", Status: " + status +
                ", Location Description: " + locationDescription +
