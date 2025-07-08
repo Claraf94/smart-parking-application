@@ -1,0 +1,46 @@
+package com.smartparking.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Component
+//this filter will incerpet HTTP requests to check for JWT tokens and set the authentication in the security context
+//OncePerRequestFilter ensures that the filter is executed once per request
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
+    @Autowired
+    private JWTAuthentication jwtAuthentication; 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, java.io.IOException {
+        //check for the authorization header in the request
+        final String authorizationHeader = request.getHeader("Authorization");
+        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            final String jwt = authorizationHeader.substring(7);
+            String username = jwtAuthentication.getUsernameFromToken(jwt);
+            //if the username is existent and the token is a valid one, then authenticate the user
+            if (username != null && jwtAuthentication.validateToken(jwt, username)){
+                // Set the authentication in the security context
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        username, null, null);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                response .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+                return;
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or malformed");
+            return;
+        }
+        // Continue with the filter chain
+        filterChain.doFilter(request, response);
+    }
+}

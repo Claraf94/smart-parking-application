@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.entity.Users;
+import com.smartparking.security.JWTAuthentication;
 import com.smartparking.service.UsersService;
 
 @RestController
@@ -19,9 +21,15 @@ import com.smartparking.service.UsersService;
 public class UsersController {
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private JWTAuthentication jwtAuthentication;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     //register a new user
     @PostMapping("/register")
     public Users registerNewUser(@RequestBody Users user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword())); //encode the password before saving
         return usersService.registerNewUser(user);
     }
 
@@ -48,5 +56,17 @@ public class UsersController {
     @GetMapping("/findAll")
     public List<Users> findAll() {
         return usersService.findAll();
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Users loginRequest) {
+        //logic to authenticate user and generate JWT token
+        Optional<Users> existentUser = usersService.findByEmail(loginRequest.getEmail());
+        if (existentUser.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), existentUser.get().getPassword())) {
+            //generate JWT token
+            return jwtAuthentication.generateSecurityToken(existentUser.get().getEmail());
+        } else {
+            throw new RuntimeException("Invalid credentials");
+        }
     }
 }//users controller class
