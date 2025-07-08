@@ -37,6 +37,7 @@ jobs:
         with:
           name: java-app
           path: '${{ github.workspace }}/Backend/target/*.jar'
+          debug: true
 
   deploy:
     runs-on: ubuntu-latest
