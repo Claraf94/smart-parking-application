@@ -90,10 +90,10 @@ public class ParkingTrack {
    @Override
     public String toString() {
         return "Parking Track ID: " + parkingID +
-            ", User: " + (user != null ? user.getFullName() : "N/A") +
-            ", Spot: " + (spot != null ? spot.getSpotCode() : "N/A") +
-            ", Check In: " + (checkIn != null ? checkIn : "N/A") +
-            ", Check Out: " + (checkOut != null ? checkOut : "N/A") +
+            ", User: " + (user != null ? user.getFirstName() + " " + user.getLastName() : "Not available.") +
+            ", Spot: " + spot +
+            ", Check In: " + checkIn +
+            ", Check Out: " + checkOut +
             ", Confirm Check In: " + confirmCheckIn +
             ", Confirm Check Out: " + confirmCheckOut;
     }

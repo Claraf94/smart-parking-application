@@ -2,10 +2,8 @@ package com.smartparking.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ExistentEmailException;
 import com.smartparking.repository.UsersRepository;

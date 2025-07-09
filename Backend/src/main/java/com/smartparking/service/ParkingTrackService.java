@@ -25,7 +25,6 @@ public class ParkingTrackService {
             ParkingTrack track = parkingTrack.get();
             //if the parking spot is not checked in, it is available
             if(!track.isConfirmCheckIn() && track.getCheckOut() == null) {
-            track.setCheckIn(LocalDateTime.now()); 
             track.setConfirmCheckIn(true);
             parkingTrackRepository.save(track);
             return true;
@@ -44,7 +43,6 @@ public class ParkingTrackService {
             ParkingTrack track = parkingTrack.get();
             //if the parking spot is checked in, it can be released
             if(track.isConfirmCheckIn() && track.getCheckOut() == null) {
-                track.setCheckOut(LocalDateTime.now());
                 track.setConfirmCheckOut(true);
                 parkingTrackRepository.save(track);
                 return true;

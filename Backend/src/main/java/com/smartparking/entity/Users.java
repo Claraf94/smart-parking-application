@@ -12,7 +12,7 @@ public class Users {
     private int userID; //unique identifier for the user
     @Column(nullable = false, unique = true) //email must be unique and cannot be null
     private String email;
-    @Column(nullable = false) //password and full name cannot be null
+    @Column(nullable = false) //password, first and last name cannot be null
     private String password, firstName, lastName;
     @Column(nullable = false) //user type cannot be null
     private String userType = "USER"; // default user type

@@ -3,7 +3,6 @@ package com.smartparking.service;
 import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Users;
 import com.smartparking.enums.NotificationType;
-import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smartparking.repository.NotificationsRepository;
@@ -18,7 +17,6 @@ public class NotificationsService{
         notification.setUser(user);
         notification.setNotificationType(type);
         notification.setTextMessage(message);
-        notification.setCreated(LocalDateTime.now());
         return notificationsRepository.save(notification);
     }
 

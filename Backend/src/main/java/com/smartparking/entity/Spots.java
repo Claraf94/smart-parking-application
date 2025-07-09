@@ -102,7 +102,7 @@ public class Spots {
         return "Spot details:\n" +
                "Spot ID: " + spotsID +
                ", Spot Code: " + (spotCode != null ? spotCode : "Not available") +
-               ", Status: " + (status != null ? status : "Not available ") +
+               ", Status: " + status +
                ", Location Description: " + (locationDescription != null ? locationDescription : "Not available.") +
                ", Coordinates: (" + x + ", " + y + ")" +
                ", Reservable: " + isReservable +

@@ -87,7 +87,7 @@ public class Notifications {
     @Override
     public String toString() {
         return "Notification ID: " + notificationID +
-               ", User: " + (user != null ? user.getFullName() : "Not available.") +
+               ", User: " + (user != null ? user.getFirstName() + " " + user.getLastName() : "Not available.") +
                ", Message: " + textMessage +
                 ", Type: " + notificationType +
                ", Fine: " + fine +
