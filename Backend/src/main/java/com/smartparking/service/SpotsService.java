@@ -36,13 +36,32 @@ public class SpotsService {
         return spotsRepository.findBySpotCode(spotCode);
     }
 
+    public Spots updateSpot(int id, Spots spot) {
+        //update a spot by its id
+        Optional<Spots> existingSpot = spotsRepository.findById(id);
+        if (existingSpot.isPresent()) {
+            existingSpot.get().setStatus(spot.getStatus());
+            existingSpot.get().setLocationDescription(spot.getLocationDescription());
+            existingSpot.get().setX(spot.getX());
+            existingSpot.get().setY(spot.getY());
+            existingSpot.get().setIsReservable(spot.getIsReservable());
+            return spotsRepository.save(existingSpot.get());
+        } else {
+            throw new RuntimeException("Spot not found with id: " + id);
+        }
+    }
+
+    public void deleteSpot(int id) {
+        //delete a spot
+        Optional<Spots> existingSpot = spotsRepository.findById(id);
+        if (!existingSpot.isPresent()) {
+            throw new RuntimeException("Spot not found with id: " + id);
+        }
+        spotsRepository.delete(existingSpot.get());
+    }
+
     public List<Spots> findAll() {
         //find all spots
         return spotsRepository.findAll();
-    }
-
-    public void deleteSpot(Spots spot) {
-        //delete a spot
-        spotsRepository.delete(spot);
     }
 }//spots service class

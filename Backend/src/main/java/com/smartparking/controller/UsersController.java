@@ -1,6 +1,7 @@
 package com.smartparking.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,15 +62,23 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Users loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Users loginRequest) {
         //logic to authenticate user and generate JWT token
         Optional<Users> existentUser = usersService.findByEmail(loginRequest.getEmail());
         if (existentUser.isPresent()){
             Users user = existentUser.get();
             if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
-                return ResponseEntity.ok("Login successful, token generated" + jwtAuthentication.generateSecurityToken(user.getEmail()));
+                List<String> roles = List.of("ROLE_USER");
+                //separating message and token for clarity when tracking login attempts
+                return ResponseEntity.ok(Map.of("message", "Login successful, token generated " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
             }
         }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Invalid email or password"));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.ok().build();
+    }
+    
 }//users controller class

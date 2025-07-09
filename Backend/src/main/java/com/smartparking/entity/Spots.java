@@ -2,6 +2,9 @@ package com.smartparking.entity;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "spots") //specifies the name of the table in the database
@@ -11,8 +14,10 @@ public class Spots {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int spotsID; //unique identifier for the parking spot
     @Column(nullable = false, unique = true) //spot code cannot be null
+    @NotBlank(message = "Spot code cannot be blank")
     private String spotCode;
     @Column(nullable = false) //spot status cannot be null
+    @NotBlank(message = "Status cannot be blank")
     private String status = "empty"; // default status 
     private String locationDescription;
     @Column(nullable = false) //coordinates cannot be null
@@ -22,6 +27,7 @@ public class Spots {
     @Column(nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
+    @NotNull(message = "Created timestamp cannot be blank")
     private LocalDateTime created; //current timestamp
 
     //constructor

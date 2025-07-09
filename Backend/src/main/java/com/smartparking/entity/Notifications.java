@@ -3,6 +3,9 @@ package com.smartparking.entity;
 import java.time.LocalDateTime;
 import com.smartparking.enums.NotificationType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
@@ -14,15 +17,19 @@ public class Notifications {
     private int notificationID; //unique identifier for the notification
     @ManyToOne //indicates a many-to-one relationship with the Users entity
     @JoinColumn(name = "userID", nullable = false)
+    @NotNull(message = "User cannot be null") //user cannot be null
     //instead of using userID, it is better to use the reference object to the users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;
     @Column(nullable = false) //text message cannot be null
+    @NotBlank(message = "Text message cannot be blank")
     private String textMessage;
     @Enumerated(EnumType.STRING) //specifies that the enum will be stored as a string in the database
-    @Column(nullable = false) 
+    @Column(nullable = false) //notification type cannot be null    
+    @NotNull(message = "Notification type cannot be null")
     private NotificationType notificationType; //type of notification, e.g., SPOT_NOT_AVAILABLE, SPOT_RESERVED_VIOLATION, etc.
     @Column(nullable = false) //fine cannot be null
+    @NotNull(message = "Fine cannot be null")
     private BigDecimal fine = BigDecimal.ZERO; //fine associated with the notification, default is zero
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP") //created time cannot be null
     private LocalDateTime created; //current time stamp

@@ -2,6 +2,7 @@ package com.smartparking.entity;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "parkingTrack") //specifies the name of the table in the database
@@ -12,11 +13,13 @@ public class ParkingTrack {
     private int parkingID; //unique identifier for the parking track
     @ManyToOne //indicates a many-to-one relationship with the Users entity
     @JoinColumn(name = "userID", nullable = false) //userID cannot be null
+    @NotNull(message = "User cannot be null")
     //instead of using userID, it is better to use the reference object to the Users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;
     @ManyToOne //indicates a many-to-one relationship with the Spots entity
     @JoinColumn(name = "spotsID", nullable = false) //spotsID cannot be null
+    @NotNull(message = "Spot cannot be null")
     //instead of using userID, it is better to use the reference object to the Spots entity
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot; 

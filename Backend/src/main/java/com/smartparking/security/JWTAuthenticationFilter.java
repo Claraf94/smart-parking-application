@@ -25,20 +25,23 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             final String jwt = authorizationHeader.substring(7);
-            String username = jwtAuthentication.getUsernameFromToken(jwt);
-            //if the username is existent and the token is a valid one, then authenticate the user
-            if (username != null && jwtAuthentication.validateToken(jwt, username)){
-                // Set the authentication in the security context
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, null);
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                response .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+            try{
+                String username = jwtAuthentication.getUsernameFromToken(jwt);
+                //if the username is existent and the token is a valid one, then authenticate the user
+                if (username != null && jwtAuthentication.validateToken(jwt, username)){
+                    // Set the authentication in the security context
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            username, null, null);
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    response .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+                    return;
+                }
+            } catch (Exception e) {
+                //if there is an exception while sending the token, then an error response is sent
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or malformed");
                 return;
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or malformed");
-            return;
         }
         // Continue with the filter chain
         filterChain.doFilter(request, response);
