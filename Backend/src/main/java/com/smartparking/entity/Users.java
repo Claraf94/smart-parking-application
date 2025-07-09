@@ -13,17 +13,18 @@ public class Users {
     @Column(nullable = false, unique = true) //email must be unique and cannot be null
     private String email;
     @Column(nullable = false) //password and full name cannot be null
-    private String password, fullName;
+    private String password, firstName, lastName;
     @Column(nullable = false) //user type cannot be null
     private String userType = "USER"; // default user type
     @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
     private LocalDateTime created; //current time stamp
 
     //constructor
-    public Users(String email, String password, String fullName, String userType) {
+    public Users(String email, String password, String firstName, String lastName, String userType) {
         this.email = email;
         this.password = password;
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.userType = userType;
     }
 
@@ -55,12 +56,20 @@ public class Users {
         this.password = password;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFirstName(){
+        return firstName;
+    }
+    
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public String getLastName() {
+        return lastName;
+    }   
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUserType() {
@@ -80,7 +89,7 @@ public class Users {
         return "User details:\n" +
                 "User ID: " + userID +
                 ", Email: " + email +
-                ", Full name: " + fullName +
+                ", Full name: " + firstName + " " + lastName +
                 ", Type: " + userType +
                 ", Created: " + created; 
     }
