@@ -43,4 +43,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         // Continue with the filter chain
         filterChain.doFilter(request, response);
     }
-}
+
+    @Override
+    //this method defines which endpoints should not have jwt authentication filter applied to them
+    //in this case, the login and register endpoints are excluded from the filter
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        System.out.println("Path: " + request.getServletPath());
+        return path.equals("/users/login") || path.equals("/users/register");
+    }
+}//jwt authentication filter class

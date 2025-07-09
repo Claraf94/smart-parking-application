@@ -23,7 +23,9 @@ public class Reservations {
     @Column(nullable = false) //phone number and number plate cannot be null
     private String phoneNumber, numberPlate;
     @Column(nullable = false) //start, end and reservedAt times cannot be null
-    private LocalDateTime startTime, endTime, reservedAt;
+    private LocalDateTime startTime, endTime;
+    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime reservedAt;
     @Column(nullable = false) //reservation status cannot be null
     private String reservationStatus = "active"; // default reservation status
 
@@ -88,10 +90,6 @@ public class Reservations {
         return reservedAt;
     }
 
-    public void setReservedAt(LocalDateTime reservedAt) {
-        this.reservedAt = reservedAt;
-    }
-
     public String getReservationStatus() {
         return reservationStatus;
     }
@@ -100,17 +98,12 @@ public class Reservations {
         this.reservationStatus = reservationStatus;
     }
 
-    @PrePersist //this method is called before the entity is saved to the database
-    protected void onCreate() {
-        this.reservedAt = LocalDateTime.now(); // set the time that the reservation was made to the current time
-    }
-
     @Override
     public String toString() {  
         return "Reservation details:\n" +
                "Reservation ID: " + reservationID +
-               ", User ID: " + user.getUserID() +
-               ", Spot ID: " + spot.getSpotsID() +
+               ", User ID: " + (user != null ? user.getUserID() : "Not available.") +
+               ", Spot ID: " + (spot != null ? spot.getSpotsID() : "Not available.")+
                ", Phone Number: " + phoneNumber +
                ", Number Plate: " + numberPlate +
                ", Start Time: " + startTime +

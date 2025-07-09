@@ -22,9 +22,22 @@ public class Notifications {
     @Enumerated(EnumType.STRING) //specifies that the enum will be stored as a string in the database
     @Column(nullable = false) 
     private NotificationType notificationType; //type of notification, e.g., SPOT_NOT_AVAILABLE, SPOT_RESERVED_VIOLATION, etc.
-    private BigDecimal fine;
-    @Column(nullable = false) //created time cannot be null
+    @Column(nullable = false) //fine cannot be null
+    private BigDecimal fine = BigDecimal.ZERO; //fine associated with the notification, default is zero
+    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP") //created time cannot be null
     private LocalDateTime created; //current time stamp
+
+
+    //constructor
+    public Notifications(Users user, String textMessage, NotificationType notificationType, BigDecimal fine) {
+        this.user = user;
+        this.textMessage = textMessage;
+        this.notificationType = notificationType;
+        this.fine = fine;
+    }
+
+    //default constructor
+    public Notifications(){}
 
     //getters and setters
     public int getNotificationID() {
@@ -71,19 +84,10 @@ public class Notifications {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    @PrePersist //this method is called before the entity is saved to the database
-    protected void onCreate() {
-        this.created = LocalDateTime.now(); //set the created time to the current time
-    }
-
     @Override
     public String toString() {
         return "Notification ID: " + notificationID +
-               ", User: " + user.getFullName() +
+               ", User: " + (user != null ? user.getFullName() : "Not available.") +
                ", Message: " + textMessage +
                 ", Type: " + notificationType +
                ", Fine: " + fine +

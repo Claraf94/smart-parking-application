@@ -16,7 +16,7 @@ public class SecurityConfigurations {
         http
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/users/register", "/actuator/**").permitAll()
+                .requestMatchers("/users/login", "/users/register", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             );
 
@@ -27,4 +27,4 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); //returns a password encoder that uses the BCrypt hashing algorithm
     }
-}
+}//security configurations class

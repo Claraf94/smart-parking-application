@@ -3,6 +3,9 @@ package com.smartparking.controller;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,14 +62,15 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Users loginRequest) {
+    public ResponseEntity<String> login(@RequestBody Users loginRequest) {
         //logic to authenticate user and generate JWT token
         Optional<Users> existentUser = usersService.findByEmail(loginRequest.getEmail());
-        if (existentUser.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), existentUser.get().getPassword())) {
-            //generate JWT token
-            return jwtAuthentication.generateSecurityToken(existentUser.get().getEmail());
-        } else {
-            throw new RuntimeException("Invalid credentials");
+        if (existentUser.isPresent()){
+            Users user = existentUser.get();
+            if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
+                return ResponseEntity.ok("Login successful, token generated" + jwtAuthentication.generateSecurityToken(user.getEmail()));
+            }
         }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
     }
 }//users controller class

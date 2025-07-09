@@ -16,8 +16,19 @@ public class Users {
     private String password, fullName;
     @Column(nullable = false) //user type cannot be null
     private String userType = "USER"; // default user type
-    @Column(nullable = false) //created time cannot be null
+    @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
     private LocalDateTime created; //current time stamp
+
+    //constructor
+    public Users(String email, String password, String fullName, String userType) {
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.userType = userType;
+    }
+
+    //default constructor
+    public Users(){}
 
     //getters and setters
     public int getUserID() {
@@ -62,15 +73,6 @@ public class Users {
 
     public LocalDateTime getCreated() {
         return created;
-    }
-
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    @PrePersist //this method is called before the entity is saved to the database
-    protected void onCreate() {
-        this.created = LocalDateTime.now(); // set the created time to the current time
     }
 
     @Override

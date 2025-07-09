@@ -10,7 +10,7 @@ public class Spots {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int spotsID; //unique identifier for the parking spot
-    @Column(nullable = false) //spot code cannot be null
+    @Column(nullable = false, unique = true) //spot code cannot be null
     private String spotCode;
     @Column(nullable = false) //spot status cannot be null
     private String status = "empty"; // default status 
@@ -21,9 +21,21 @@ public class Spots {
     private int y = 0; //default y coordinate
     @Column(nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
-    @Column(nullable = false) //created time cannot be null
-    private LocalDateTime created; //current time stamp
+    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
+    private LocalDateTime created; //current timestamp
 
+    //constructor
+    public Spots(String spotCode, String locationDescription, int x, int y, Boolean isReservable) {
+        this.spotCode = spotCode;
+        this.locationDescription = locationDescription;
+        this.x = x;
+        this.y = y;
+        this.isReservable = isReservable;
+    }
+
+    //default constructor
+    public Spots(){}
+    
     //getters and setters
     public int getSpotsID() {
         return spotsID;
@@ -85,22 +97,14 @@ public class Spots {
         return created;
     }   
 
-    public void setCreated(LocalDateTime created) {
-        this.created = created;
-    }
-
-    @PrePersist //this method is called before the entity is saved to the database
-    protected void onCreate() {
-        this.created = LocalDateTime.now(); // set the created time to the current time
-    }
-
     @Override
     public String toString() {
         return "Spot details:\n" +
                "Spot ID: " + spotsID +
-               ", Spot Code: " + spotCode +
-               ", Status: " + status +
-               ", Location Description: " + locationDescription +
+               ", Spot Code: " + (spotCode != null ? spotCode : "Not available") +
+               ", Status: " + (status != null ? status : "Not available ") +
+               ", Location Description: " + (locationDescription != null ? locationDescription : "Not available.") +
+               ", Coordinates: (" + x + ", " + y + ")" +
                ", Reservable: " + isReservable +
                ", Created: " + created;
     }

@@ -20,13 +20,24 @@ public class ParkingTrack {
     //instead of using userID, it is better to use the reference object to the Spots entity
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot; 
-    @Column(nullable = false) //check in and check out time cannot be null
-    private LocalDateTime checkIn, checkOut;
+    @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime checkIn;//check in and check out time cannot be null
+    @Column(name = "checkOut", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime checkOut;
     @Column(nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status
     @Column(nullable = false) 
     private boolean confirmCheckOut = false; // default confirm check out status
     
+    //constructor
+    public ParkingTrack(Users user, Spots spot) {
+        this.user = user;
+        this.spot = spot;
+    }   
+
+    //default constructor
+    public ParkingTrack(){}
+
     //getters and setters
     public int getParkingID() {
         return parkingID;
@@ -56,16 +67,8 @@ public class ParkingTrack {
         return checkIn;
     }
 
-    public void setCheckIn(LocalDateTime checkIn) {
-        this.checkIn = checkIn;
-    }
-
     public LocalDateTime getCheckOut() {
         return checkOut;
-    }
-
-    public void setCheckOut(LocalDateTime checkOut) {
-        this.checkOut = checkOut;
     }
 
     public boolean isConfirmCheckIn() {
@@ -84,19 +87,14 @@ public class ParkingTrack {
         this.confirmCheckOut = confirmCheckOut;
     }
 
-    @PrePersist //this method is called before the entity is saved to the database
-    protected void onCheckIn() {
-        this.checkIn = LocalDateTime.now(); //set the check in time to the current time
-    }
-
-    @Override
+   @Override
     public String toString() {
         return "Parking Track ID: " + parkingID +
-               ", User: " + user.getFullName() +
-               ", Spot: " + spot.getSpotCode() +
-               ", Check In: " + checkIn +
-               ", Check Out: " + checkOut +
-               ", Confirm Check In: " + confirmCheckIn +
-               ", Confirm Check Out: " + confirmCheckOut;
+            ", User: " + (user != null ? user.getFullName() : "N/A") +
+            ", Spot: " + (spot != null ? spot.getSpotCode() : "N/A") +
+            ", Check In: " + (checkIn != null ? checkIn : "N/A") +
+            ", Check Out: " + (checkOut != null ? checkOut : "N/A") +
+            ", Confirm Check In: " + confirmCheckIn +
+            ", Confirm Check Out: " + confirmCheckOut;
     }
 }//parking track class
