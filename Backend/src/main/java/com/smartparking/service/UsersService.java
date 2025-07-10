@@ -2,8 +2,11 @@ package com.smartparking.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.smartparking.entity.ResetPassword;
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ExistentEmailException;
 import com.smartparking.repository.UsersRepository;
@@ -12,13 +15,19 @@ import com.smartparking.repository.UsersRepository;
 public class UsersService {
     @Autowired
     private UsersRepository usersRepository;
+    @Autowired
+    private ResetPasswordService resetPasswordService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    //private TokenEmailService tokenEmailService;
+
     //register a new user
     public Users registerNewUser(Users user) {
         //checking if the user already exists by using the email before register it
         if(usersRepository.existsByEmail(user.getEmail())) {
             throw new ExistentEmailException("This email " + user.getEmail() + " is already registered.");
         }
-
     //saving user to the database
     return usersRepository.save(user); 
     }
@@ -39,8 +48,58 @@ public class UsersService {
         return usersRepository.findByUserType(userType);
     }
 
+    public Users save(Users user){
+        //update and save user info
+        return usersRepository.save(user);
+    }
+
     public List<Users> findAll() {
         //find all users
         return usersRepository.findAll();
+    }
+
+    public boolean resetPasswordWithToken(String tokenPassword, String newPassword){
+        Optional<ResetPassword> reset = resetPasswordService.validateToken(tokenPassword);
+        if(reset.isEmpty()){
+            return false;
+        }
+        ResetPassword resetP = reset.get();
+        Users user = resetP.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        save(user);
+        resetPasswordService.deleteToken(resetP);
+        return true;
+    }
+
+    public void sendResetEmail(String email){
+        Optional<Users> userP = usersRepository.findByEmail(email);
+        if(userP.isEmpty()){
+            throw new IllegalArgumentException("No user was found.");
+        }
+        Users user = userP.get();
+        String tokenPassword = UUID.randomUUID().toString();
+        resetPasswordService.createResetToken(user, tokenPassword);
+
+        String link = "https://frontend.com/reset-password?token=" + tokenPassword;
+
+        String subject = "Reset password";
+        String body = "Hello, " + user.getFirstName() + ",\n" 
+                    + "To reset your password, please use the link bellow. This link is valid for 15 minutes.\n"
+                    + link;  
+        //tokenEmailService.SendEmail(user.getEmail(), subject, body);
+    }
+
+    public boolean updatePassword(String email, String currentPassword, String newPassword){
+        Optional<Users> userP = findByEmail(email);
+        if(userP.isEmpty()){
+            return false;
+        }
+        Users user = userP.get();
+        if(passwordEncoder.matches(currentPassword, user.getPassword())){
+            user.setPassword(passwordEncoder.encode(newPassword));
+            save(user);
+            return true;
+        }
+        return false;
     }
 }//users service class

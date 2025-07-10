@@ -24,7 +24,7 @@ public class ParkingTrackController {
     //put the spot as occupied
     @PutMapping("/checkin/{id}")
     public ResponseEntity<String> checkinSpot(@PathVariable int id){
-        if(parkingTrackService.getSpot(id)){
+        if(parkingTrackService.checkInSpot(id)){
             return ResponseEntity.ok("Check in successful at the spot: " + id);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check in failed at the spot: " + id);
@@ -34,7 +34,7 @@ public class ParkingTrackController {
     //put the spot as released
     @PutMapping("/checkout/{id}")
     public ResponseEntity<String> checkoutSpot(@PathVariable int id){
-        if(parkingTrackService.releaseSpot(id)){
+        if(parkingTrackService.checkOutSpot(id)){
             return ResponseEntity.ok("Check out successful at the spot: " + id);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check out failed at the spot: " + id);
@@ -44,6 +44,9 @@ public class ParkingTrackController {
     //returns every activity made by a specific user by its ID
     @GetMapping("/user/{userId}")
     public List<ParkingTrack> getByUser(@PathVariable int userId){
+        if(userId <=0){
+            throw new IllegalArgumentException("Invalid type of ID.");
+        }
         Users user = new Users();
         user.setUserID(userId);
         return parkingTrackService.getByUser(user);
@@ -52,6 +55,9 @@ public class ParkingTrackController {
     //returns parking activity for a specific spot by its ID
     @GetMapping("/spots/{spotsId}")
     public List<ParkingTrack> getBySpot(@PathVariable int spotsId){
+        if(spotsId <=0){
+            throw new IllegalArgumentException("Invalid type of ID.");
+        }
         Spots spot = new Spots();
         spot.setSpotsID(spotsId);
         return parkingTrackService.getBySpot(spot);

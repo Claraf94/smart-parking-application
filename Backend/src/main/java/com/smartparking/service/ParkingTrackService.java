@@ -1,5 +1,6 @@
 package com.smartparking.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,35 +15,41 @@ public class ParkingTrackService {
     @Autowired
     private ParkingTrackRepository parkingTrackRepository;
     
-    public boolean getSpot (int Id) {
+    public boolean checkInSpot (int parkingTrackId) {
+        if(parkingTrackId <= 0)
+            throw new IllegalArgumentException("Invalid ID for the spot.");
         // Check if the parking spot is available
         //it will be considered available if there is no parking track associated 
         //by using the check in and check out times
-        Optional<ParkingTrack> parkingTrack = parkingTrackRepository.findById(Id);
+        Optional<ParkingTrack> parkingTrack = parkingTrackRepository.findById(parkingTrackId);
         //if the register exists, it means that the parking spot is not available
         if (parkingTrack.isPresent()) {
             ParkingTrack track = parkingTrack.get();
             //if the parking spot is not checked in, it is available
             if(!track.isConfirmCheckIn() && track.getCheckOut() == null) {
-            track.setConfirmCheckIn(true);
-            parkingTrackRepository.save(track);
-            return true;
+                track.setConfirmCheckIn(true);
+                parkingTrackRepository.save(track);
+                return true;
             }   
-        //if is checked in, it is not available
-        return false;
+            //if is checked in, it is not available
+            return false;
         }
         //no register found, so the parking spot is available
         return false;
     }
 
-    public boolean releaseSpot(int Id) {
+    public boolean checkOutSpot(int parkingTrackId) {
+        if(parkingTrackId <= 0){
+            throw new IllegalArgumentException("Invalid ID for the spot.");
+        }
         // Check if the parking spot is checked in
-        Optional<ParkingTrack> parkingTrack = parkingTrackRepository.findById(Id);
+        Optional<ParkingTrack> parkingTrack = parkingTrackRepository.findById(parkingTrackId);
         if (parkingTrack.isPresent()) {
             ParkingTrack track = parkingTrack.get();
             //if the parking spot is checked in, it can be released
             if(track.isConfirmCheckIn() && track.getCheckOut() == null) {
                 track.setConfirmCheckOut(true);
+                track.setCheckOut(LocalDateTime.now());
                 parkingTrackRepository.save(track);
                 return true;
             }

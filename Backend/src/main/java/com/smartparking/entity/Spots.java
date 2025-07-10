@@ -16,11 +16,9 @@ public class Spots {
     @Column(nullable = false, unique = true) //spot code cannot be null
     @NotBlank(message = "Spot code cannot be blank")
     private String spotCode;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SpotStatus status = SpotStatus.EMPTY; //default status
-
     private String locationDescription;
     @Column(nullable = false) //coordinates cannot be null
     private int x = 0; //default x coordinate

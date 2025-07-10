@@ -28,7 +28,7 @@ public class ReservationsService {
             }
         
             boolean exists = reservationsRepository.existsBySpotAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                reservation.getSpot(), 
+                existingSpot.get(), 
                 reservation.getStartTime(), 
                 reservation.getEndTime()
             );
@@ -60,6 +60,9 @@ public class ReservationsService {
     }
 
     public void deleteReservation(int reservationID) {
+        if(!reservationsRepository.existsById(reservationID)){
+            throw new IllegalArgumentException("Reservation not found.");
+        }
         //delete a reservation by ID
         reservationsRepository.deleteById(reservationID);
     }

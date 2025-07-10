@@ -59,6 +59,9 @@ public class SpotsController {
     @PreAuthorize("hasRole('ADMIN')") //only admin can update parking spots on the system
     @PutMapping("/update/{id}")
     public ResponseEntity<Spots> updateSpot(@PathVariable int id, @RequestBody Spots spot) {
+        if (id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
         try{
             return ResponseEntity.ok(spotsService.updateSpot(id, spot));
         }catch(Exception e){
@@ -71,6 +74,9 @@ public class SpotsController {
     @DeleteMapping("/delete/{id}")
     //response body will be void/empty 
     public ResponseEntity<Void> deleteSpot(@PathVariable int id) {
+        if (id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
         spotsService.deleteSpot(id);
         return ResponseEntity.noContent().build();
     }

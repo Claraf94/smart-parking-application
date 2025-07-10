@@ -16,6 +16,7 @@ import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ReservationConflictException;
 import com.smartparking.service.ReservationsService;
+import com.smartparking.service.SpotsService;
 
 @RestController
 @RequestMapping("/reservations")
@@ -23,6 +24,8 @@ import com.smartparking.service.ReservationsService;
 public class ReservationsController {
     @Autowired
     private ReservationsService reservationsService;
+    @Autowired
+    private SpotsService spotsService;
 
     //create a new reservations
     @PostMapping("/create")
@@ -37,6 +40,9 @@ public class ReservationsController {
     //returns reservation by user
     @GetMapping("/user/{userId}")
     public List<Reservations> getReservationsByUser(@PathVariable int userId) {
+        if(userId<=0){
+            throw new IllegalArgumentException("Invalid user ID.");
+        }
         Users user = new Users();
         user.setUserID(userId); 
         return reservationsService.findByUser(user);
@@ -45,9 +51,13 @@ public class ReservationsController {
     //returns reservation by spot
     @GetMapping("/spot/{spotId}")
     public List<Reservations> getReservationsBySpot(@PathVariable int spotId) {
-        Spots spot = new Spots();
-        spot.setSpotsID(spotId);
-        return reservationsService.findBySpot(spot);
+        if(spotId <=0){
+            throw new IllegalArgumentException("Invalid spot ID.");
+        }
+        if(spotsService.findById(spotId).isEmpty()){
+            throw new IllegalArgumentException("Spot not found.");
+        }
+        return reservationsService.findBySpot(spotsService.findById(spotId).get());
     }
 
     //returns reservation by status

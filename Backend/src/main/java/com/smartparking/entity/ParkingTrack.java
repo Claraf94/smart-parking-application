@@ -25,7 +25,7 @@ public class ParkingTrack {
     private Spots spot; 
     @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime checkIn;//check in and check out time cannot be null
-    @Column(name = "checkOut", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "checkOut", insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime checkOut;
     @Column(nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status
@@ -74,6 +74,10 @@ public class ParkingTrack {
         return checkOut;
     }
 
+    public void setCheckOut(LocalDateTime checkOut){
+        this.checkOut = checkOut;
+    }
+
     public boolean isConfirmCheckIn() {
         return confirmCheckIn;
     }
@@ -94,7 +98,7 @@ public class ParkingTrack {
     public String toString() {
         return "Parking Track ID: " + parkingID +
             ", User: " + (user != null ? user.getFirstName() + " " + user.getLastName() : "Not available.") +
-            ", Spot: " + spot +
+            ", Spot: " + spot.getSpotsID() +
             ", Check In: " + checkIn +
             ", Check Out: " + checkOut +
             ", Confirm Check In: " + confirmCheckIn +
