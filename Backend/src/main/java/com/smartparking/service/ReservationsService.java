@@ -14,19 +14,34 @@ import com.smartparking.repository.ReservationsRepository;
 public class ReservationsService {
     @Autowired
     private ReservationsRepository reservationsRepository;
+    @Autowired
+    private SpotsService spotsService;
+
     //verify if a reservation exists before creating it by using the Spots entity reference and the start and end times
     public Reservations createReservation(Reservations reservation) {
-        boolean exists = reservationsRepository.existsBySpotAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-            reservation.getSpot(), 
-            reservation.getStartTime(), 
-            reservation.getEndTime()
-        );
+        //check if the spot exists first
+        Spots spot = reservation.getSpot();
+        if (spot != null && spot.getSpotCode() != null && !spot.getSpotCode().isEmpty()) {
+            var existingSpot = spotsService.findBySpotCode(spot.getSpotCode());
+            if(existingSpot.isEmpty()){
+                throw new IllegalArgumentException("Invalid spot code for reservation.");
+            }
+        
+            boolean exists = reservationsRepository.existsBySpotAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+                reservation.getSpot(), 
+                reservation.getStartTime(), 
+                reservation.getEndTime()
+            );
 
-        if(exists) {
-            throw new ReservationConflictException("This reservation conflicts with an existing reservation for the same spot and period.");
+            if(exists) {
+                throw new ReservationConflictException("This reservation conflicts with an existing reservation for the same spot and period.");
+            }
+            //if the reservation does not conflict, save it
+            reservation.setSpot(existingSpot.get());
+            return reservationsRepository.save(reservation);
+        }else{
+            throw new IllegalArgumentException("Spot and its code are required for reservation and cannot be empty.");
         }
-        //if the reservation does not conflict, save it
-        return reservationsRepository.save(reservation);
     }   
 
     public List<Reservations> findByUser(Users user) {

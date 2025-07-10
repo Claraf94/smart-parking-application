@@ -73,7 +73,7 @@ public class ParkingTrackService {
         return parkingTrackRepository.findByConfirmCheckOutTrue();
     }
 
-    public List<ParkingTrack> getPendingCheckedIn() {
+    public List<ParkingTrack> getPendingCheckIns() {
         //find by spots that a reservation was made but has no check-in register yet
         return parkingTrackRepository.findByConfirmCheckInFalse();
     }

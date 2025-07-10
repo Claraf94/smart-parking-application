@@ -2,6 +2,8 @@ package com.smartparking.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,16 +20,25 @@ import com.smartparking.service.ParkingTrackService;
 public class ParkingTrackController {
     @Autowired
     private ParkingTrackService parkingTrackService;
+
     //put the spot as occupied
-    @PutMapping("/get/{id}")
-    public boolean getSpot(@PathVariable int id){
-        return parkingTrackService.getSpot(id);
+    @PutMapping("/checkin/{id}")
+    public ResponseEntity<String> checkinSpot(@PathVariable int id){
+        if(parkingTrackService.getSpot(id)){
+            return ResponseEntity.ok("Check in successful at the spot: " + id);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check in failed at the spot: " + id);
+        }
     }
 
     //put the spot as released
-    @PutMapping("/release/{id}")
-    public boolean releaseSpot(@PathVariable int id){
-        return parkingTrackService.releaseSpot(id);
+    @PutMapping("/checkout/{id}")
+    public ResponseEntity<String> checkoutSpot(@PathVariable int id){
+        if(parkingTrackService.releaseSpot(id)){
+            return ResponseEntity.ok("Check out successful at the spot: " + id);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check out failed at the spot: " + id);
+        }
     }
 
     //returns every activity made by a specific user by its ID
@@ -39,7 +50,7 @@ public class ParkingTrackController {
     }
     
     //returns parking activity for a specific spot by its ID
-    @GetMapping("/spot/{spotId}")
+    @GetMapping("/spots/{spotsId}")
     public List<ParkingTrack> getBySpot(@PathVariable int spotsId){
         Spots spot = new Spots();
         spot.setSpotsID(spotsId);
@@ -59,9 +70,9 @@ public class ParkingTrackController {
     }
 
     //returns reservations where the driver has not checked-in yet
-    @GetMapping("/pending-check-in")
+    @GetMapping("/pending-checkin")
     public List<ParkingTrack> getPendingCheckIns(){
-        return parkingTrackService.getPendingCheckedIn();
+        return parkingTrackService.getPendingCheckIns();
     }
     
     //returns all parking track register

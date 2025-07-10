@@ -2,6 +2,8 @@ package com.smartparking.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,8 +25,8 @@ public class SpotsController {
     //register a new parking spot
     @PreAuthorize("hasRole('ADMIN')") //only admin can create new parking spots on the system
     @PostMapping("/register")
-    public Spots registerNewSpot(@RequestBody Spots spot) {
-        return spotsService.saveSpot(spot);
+    public ResponseEntity<Spots> registerNewSpot(@RequestBody Spots spot) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(spotsService.saveSpot(spot));
     }
 
     //returns a parking spot by its status

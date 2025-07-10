@@ -2,6 +2,8 @@ package com.smartparking.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
+import com.smartparking.exceptions.PlatformExceptions.ReservationConflictException;
 import com.smartparking.service.ReservationsService;
 
 @RestController
@@ -23,8 +26,12 @@ public class ReservationsController {
 
     //create a new reservations
     @PostMapping("/create")
-    public Reservations createReservation(@RequestBody Reservations reservation) {
-        return reservationsService.createReservation(reservation);
+    public ResponseEntity<Reservations> createReservation(@RequestBody Reservations reservation) {
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(reservationsService.createReservation(reservation));
+        }catch (IllegalArgumentException | ReservationConflictException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     //returns reservation by user
@@ -51,8 +58,9 @@ public class ReservationsController {
 
     //delete a reservation by ID
     @DeleteMapping("/delete/{reservationId}")
-    public void deleteReservation(@PathVariable int reservationId) {
+    //response body will be void/empty 
+    public ResponseEntity<Void> deleteReservation(@PathVariable int reservationId) {
         reservationsService.deleteReservation(reservationId);
+        return ResponseEntity.noContent().build();
     }
-
 }//reservations controller class
