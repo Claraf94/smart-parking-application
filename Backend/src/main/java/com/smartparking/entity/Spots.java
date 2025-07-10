@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.smartparking.enums.SpotStatus;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "spots") //specifies the name of the table in the database
@@ -15,9 +16,11 @@ public class Spots {
     @Column(nullable = false, unique = true) //spot code cannot be null
     @NotBlank(message = "Spot code cannot be blank")
     private String spotCode;
-    @Column(nullable = false) //spot status cannot be null
-    @NotBlank(message = "Status cannot be blank")
-    private String status = "empty"; // default status 
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SpotStatus status = SpotStatus.EMPTY; //default status
+
     private String locationDescription;
     @Column(nullable = false) //coordinates cannot be null
     private int x = 0; //default x coordinate
@@ -58,11 +61,11 @@ public class Spots {
         this.spotCode = spotCode;
     }
 
-    public String getStatus() {
+    public SpotStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(SpotStatus status) {
         this.status = status;
     }
 
