@@ -2,7 +2,6 @@ package com.smartparking.service;
 
 import java.util.List;
 import java.util.Optional;
-import com.smartparking.security.JWTAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smartparking.entity.Spots;
@@ -11,14 +10,9 @@ import com.smartparking.repository.SpotsRepository;
 
 @Service //this class is a spot service component
 public class SpotsService {
-
-    private final JWTAuthentication JWTAuthentication;
     @Autowired
     private SpotsRepository spotsRepository;
 
-    SpotsService(JWTAuthentication JWTAuthentication) {
-        this.JWTAuthentication = JWTAuthentication;
-    }
     //registering or saving a spot to a database
     public Spots saveSpot(Spots spot){
         if(spotsRepository.findBySpotCode(spot.getSpotCode()).isPresent()) {

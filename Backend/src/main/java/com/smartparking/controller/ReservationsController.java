@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.entity.Reservations;
-import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ReservationConflictException;
 import com.smartparking.service.ReservationsService;
