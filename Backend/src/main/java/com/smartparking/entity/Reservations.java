@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.smartparking.enums.ReservationStatus;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "reservations") //specifies the name of the table in the database
@@ -38,9 +39,10 @@ public class Reservations {
     private LocalDateTime endTime;
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime reservedAt;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false) //reservation status cannot be null
-    @NotBlank(message = "Reservation status cannot be blank")
-    private String reservationStatus = "active"; // default reservation status
+    @NotNull(message = "Reservation status cannot be null")
+    private ReservationStatus reservationStatus = ReservationStatus.ACTIVE; // default reservation status
 
     //getters and setters
     public int getReservationID() {
@@ -103,11 +105,11 @@ public class Reservations {
         return reservedAt;
     }
 
-    public String getReservationStatus() {
+    public ReservationStatus getReservationStatus() {
         return reservationStatus;
     }
 
-    public void setReservationStatus(String reservationStatus) {
+    public void setReservationStatus(ReservationStatus reservationStatus) {
         this.reservationStatus = reservationStatus;
     }
 
