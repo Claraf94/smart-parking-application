@@ -5,7 +5,6 @@ import com.smartparking.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
@@ -31,16 +30,18 @@ public class Notifications {
     @Column(nullable = false) //fine cannot be null
     @NotNull(message = "Fine cannot be null")
     private BigDecimal fine = BigDecimal.ZERO; //fine associated with the notification, default is zero
+    @Column(nullable = false) //isPaid cannot be null
+    private Boolean isPaid = false;
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP") //created time cannot be null
     private LocalDateTime created; //current time stamp
 
-
     //constructor
-    public Notifications(Users user, String textMessage, NotificationType notificationType, BigDecimal fine) {
+    public Notifications(Users user, String textMessage, NotificationType notificationType, BigDecimal fine, Boolean isPaid) {
         this.user = user;
         this.textMessage = textMessage;
         this.notificationType = notificationType;
         this.fine = fine;
+        this.isPaid =  isPaid;
     }
 
     //default constructor
@@ -87,6 +88,13 @@ public class Notifications {
         this.fine = fine;
     }
 
+    public Boolean getIsPaid(){
+        return isPaid;
+    }
+
+    public void setIsPaid(Boolean isPaid){
+        this.isPaid = isPaid;
+    }
     public LocalDateTime getCreated() {
         return created;
     }
@@ -98,6 +106,7 @@ public class Notifications {
                ", Message: " + textMessage +
                 ", Type: " + notificationType +
                ", Fine: " + fine +
+               ", Paid: " + isPaid +
                ", Created: " + created;
     }
 }//notifications class

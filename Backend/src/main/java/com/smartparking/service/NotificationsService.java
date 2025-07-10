@@ -3,27 +3,59 @@ package com.smartparking.service;
 import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Users;
 import com.smartparking.enums.NotificationType;
+import java.math.BigDecimal;
+import java.util.List;
+import com.smartparking.security.JWTAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.smartparking.repository.NotificationsRepository;
+import com.smartparking.repository.UsersRepository;
 
 @Service //this class is a notification service component
 public class NotificationsService{
     @Autowired
     private NotificationsRepository notificationsRepository;
-    //create a new notification
+    @Autowired
+    private UsersRepository usersRepository;
+    private static final BigDecimal DEFAULT_FINE_AMOUNT = new BigDecimal("20.00");
+
+    //create a new notification. not applied for when there is a fine
     public Notifications createNotification(Users user, NotificationType type, String message) {
+        //verifying if the users exists on the database 
+        if(user == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
+            throw new IllegalArgumentException("User does not exist on the database.");
+        }
+
         Notifications notification = new Notifications();
         notification.setUser(user);
         notification.setNotificationType(type);
         notification.setTextMessage(message);
+        notification.setFine(BigDecimal.ZERO);
+        notification.setIsPaid(false);
+        return notificationsRepository.save(notification);
+    }
+
+    //create a new notification related to a fine application
+    public Notifications createFineNotification(Users user){
+        //verifying if the user exists on the database 
+        if(user == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
+            throw new IllegalArgumentException("User does not exist.");
+        }
+
+        Notifications notification = new Notifications();
+        notification.setUser(user);
+        notification.setNotificationType(NotificationType.FINE_APPLIED);
+        notification.setTextMessage("A fine of € "+ DEFAULT_FINE_AMOUNT + " has been applied to your account due to problems following the parking rules.");
+        notification.setFine(DEFAULT_FINE_AMOUNT);
+        notification.setIsPaid(false);
         return notificationsRepository.save(notification);
     }
 
     //personalized notification for user
     public Notifications createNotificationForUser(Users user, NotificationType type){
-        if(user == null || type == null) {
-            throw new IllegalArgumentException("User and NotificationType must not be null");
+        if(user == null || type == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
+            throw new IllegalArgumentException("User and Notification type must not be null and user must exists.");
         }
         
         String message = "";
@@ -60,5 +92,29 @@ public class NotificationsService{
                 break;
         }
         return createNotification(user, type, message);
+    }
+
+    //mark a fine as paid
+    public Notifications markAsPaid(String notificationId){
+        int id = Integer.parseInt(notificationId);
+        if(notificationsRepository.findById(id).isEmpty()){
+            throw new IllegalArgumentException("Notification not found with the provided id.");
+        }
+
+        Notifications notification = notificationsRepository.findById(id).get();
+        if(notification.getFine() != null && notification.getFine().compareTo(BigDecimal.ZERO) > 0){
+            notification.setIsPaid(true);
+            return notificationsRepository.save(notification);
+        }else{
+            throw new IllegalArgumentException("You have no fine to be paid.");
+        }
+    }
+
+    //returns a list of all unpaid fines to the user
+    public List<Notifications> getUnpaidFines(Users user){
+        if(user != null && user.getUserID() != 0 && usersRepository.findById(user.getUserID()).isPresent()){
+            return notificationsRepository.findByUserAndIsPaidFalseAndFineGreaterThan(user, BigDecimal.ZERO);
+        }
+        throw new IllegalArgumentException("User must have a valid ID and not be empty.");
     }
 }//notifications service class

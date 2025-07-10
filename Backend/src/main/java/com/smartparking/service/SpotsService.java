@@ -19,7 +19,7 @@ public class SpotsService {
         }
         return spotsRepository.save(spot);
     }
-
+    
     public List<Spots> findByStatus(String status) {
         //find a spot by its Status
         return spotsRepository.findByStatus(status);
@@ -30,6 +30,10 @@ public class SpotsService {
         return spotsRepository.findByIsReservableTrue();
     }
     
+    public List<Spots> findByStatusAndIsReservable(String status, Boolean isReservable){
+        return spotsRepository.findByStatusAndIsReservable(status, isReservable);
+    }
+
     //Optional is used to handle cases where the spot might not exist
     public Optional<Spots> findBySpotCode(String spotCode) {
         //find a spot by its code
