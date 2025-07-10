@@ -3,8 +3,7 @@ package com.smartparking.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-//this class is a token email service component
+@Service//this class is a token email service component
 public class TokenEmailService {
     @Autowired
     private SetEmailService setEmailService;

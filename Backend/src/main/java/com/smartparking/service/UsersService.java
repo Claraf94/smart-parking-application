@@ -10,7 +10,6 @@ import com.smartparking.entity.ResetPassword;
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ExistentEmailException;
 import com.smartparking.repository.UsersRepository;
-import com.smartparking.service.TokenEmailService;
 
 @Service //this class is a user service component
 public class UsersService {
