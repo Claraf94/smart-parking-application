@@ -1,6 +1,6 @@
 package com.smartparking.dto;
 
-
+// This class represents a request to update a user's password.
 public class PasswordUpdateRequest {
     private String currentPassword;
     private String newPassword;

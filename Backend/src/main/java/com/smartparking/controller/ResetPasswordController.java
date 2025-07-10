@@ -12,7 +12,7 @@ import com.smartparking.service.UsersService;
 
 @RestController
 @RequestMapping("resetPassword")
-//this controller will handle 
+//this controller will handle reset password requests
 public class ResetPasswordController {
     @Autowired
     private UsersService usersService;

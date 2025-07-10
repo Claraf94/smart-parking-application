@@ -10,6 +10,7 @@ import com.smartparking.entity.ResetPassword;
 import com.smartparking.entity.Users;
 import com.smartparking.exceptions.PlatformExceptions.ExistentEmailException;
 import com.smartparking.repository.UsersRepository;
+import com.smartparking.service.TokenEmailService;
 
 @Service //this class is a user service component
 public class UsersService {
@@ -20,7 +21,7 @@ public class UsersService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    //private TokenEmailService tokenEmailService;
+    private TokenEmailService tokenEmailService;
 
     //register a new user
     public Users registerNewUser(Users user) {
@@ -86,7 +87,7 @@ public class UsersService {
         String body = "Hello, " + user.getFirstName() + ",\n" 
                     + "To reset your password, please use the link bellow. This link is valid for 15 minutes.\n"
                     + link;  
-        //tokenEmailService.SendEmail(user.getEmail(), subject, body);
+        tokenEmailService.sendEmail(user.getEmail(), subject, body);
     }
 
     public boolean updatePassword(String email, String currentPassword, String newPassword){
