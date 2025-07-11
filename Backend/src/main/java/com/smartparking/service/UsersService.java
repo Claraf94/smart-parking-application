@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.smartparking.entity.ResetPassword;
 import com.smartparking.entity.Users;
+import com.smartparking.enums.UserType;
 import com.smartparking.exceptions.PlatformExceptions.ExistentEmailException;
 import com.smartparking.repository.UsersRepository;
 
@@ -43,9 +44,9 @@ public class UsersService {
         return usersRepository.existsByEmail(email);
     }
 
-    public List<Users> findByUserType(String userType) {
+    public List<Users> findByUserType(UserType userT) {
         //find a user by its ype
-        return usersRepository.findByUserType(userType);
+        return usersRepository.findByUserType(userT);
     }
 
     public Users save(Users user){

@@ -16,6 +16,7 @@ public class SetEmailService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
+        message.setFrom("parkingapplication25@gmail.com");
         
         // Send the email using the JavaMailSender
         emailSender.send(message);

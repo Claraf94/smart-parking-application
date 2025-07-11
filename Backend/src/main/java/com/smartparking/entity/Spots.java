@@ -27,7 +27,6 @@ public class Spots {
     @Column(nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
-    @NotNull(message = "Created timestamp cannot be blank")
     private LocalDateTime created; //current timestamp
 
     //constructor

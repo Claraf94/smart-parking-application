@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.smartparking.dto.PasswordResetRequest;
+import com.smartparking.dto.EmailRequest;
 import com.smartparking.service.UsersService;
 
 @RestController
@@ -18,7 +18,7 @@ public class ResetPasswordController {
     private UsersService usersService;
 
     @PostMapping("/request")
-    public ResponseEntity<String> requestReset(@RequestBody PasswordResetRequest request){
+    public ResponseEntity<String> requestReset(@RequestBody EmailRequest request){
         String email = request.getEmail();
         if(email != null && !email.isEmpty()){
             try{
@@ -27,7 +27,8 @@ public class ResetPasswordController {
             }catch(IllegalArgumentException e){
                 return ResponseEntity.badRequest().body(e.getMessage());
             }catch(Exception e){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while trying to request the token: " + e.getMessage());
             }
         }
         return ResponseEntity.badRequest().body("Email not valid.");

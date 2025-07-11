@@ -1,5 +1,6 @@
 package com.smartparking.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.dto.PasswordResetRequest;
 import com.smartparking.dto.PasswordUpdateRequest;
 import com.smartparking.entity.Users;
+import com.smartparking.enums.UserType;
 import com.smartparking.security.JWTAuthentication;
 import com.smartparking.service.UsersService;
 
@@ -54,8 +56,13 @@ public class UsersController {
     
     //returns users by its type
     @GetMapping("/findByUserType/{userType}")
-    public List<Users> findByUserType(@PathVariable String userType) {
-        return usersService.findByUserType(userType);
+    public ResponseEntity<List<Users>> findByUserType(@PathVariable String userType) {
+        try{
+            UserType userT = UserType.valueOf(userType.toUpperCase());
+            return ResponseEntity.ok(usersService.findByUserType(userT));
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(Collections.emptyList());
+        }
     }
 
     //returns all users (admin tool)

@@ -1,8 +1,6 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartparking.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -20,7 +18,6 @@ public class Users {
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should have a valid format")
     private String email;
-    @JsonIgnore
     @Column(nullable = false) //password, first and last name cannot be null
     @NotBlank(message = "Password cannot be blank")
     private String password;
