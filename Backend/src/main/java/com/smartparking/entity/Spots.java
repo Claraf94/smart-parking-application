@@ -3,7 +3,6 @@ package com.smartparking.entity;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import com.smartparking.enums.SpotStatus;
 
 @Entity //indicates that this class is an entity and is mapped to a database table

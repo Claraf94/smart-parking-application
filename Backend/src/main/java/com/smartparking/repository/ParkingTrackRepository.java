@@ -1,6 +1,7 @@
 package com.smartparking.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.smartparking.entity.ParkingTrack;
@@ -19,4 +20,6 @@ public interface ParkingTrackRepository extends JpaRepository<ParkingTrack, Inte
     List<ParkingTrack> findByConfirmCheckOutTrue();
     //available parking spots that are not checked in
     List<ParkingTrack> findByConfirmCheckInFalse();
+    //tracking parking spots that are empty
+    Optional<ParkingTrack> findBySpotAndConfirmCheckInFalseAndCheckOutIsNull(Spots spot);
 }//parking track repository class

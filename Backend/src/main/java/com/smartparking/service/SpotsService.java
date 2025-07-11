@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smartparking.entity.Spots;
+import com.smartparking.enums.SpotStatus;
 import com.smartparking.exceptions.PlatformExceptions.ExistentSpotException;
 import com.smartparking.repository.SpotsRepository;
 
@@ -26,7 +27,7 @@ public class SpotsService {
         return spotsRepository.findById(id);
     }
     
-    public List<Spots> findByStatus(String status) {
+    public List<Spots> findByStatus(SpotStatus status) {
         //find a spot by its Status
         return spotsRepository.findByStatus(status);
     }
@@ -36,7 +37,7 @@ public class SpotsService {
         return spotsRepository.findByIsReservableTrue();
     }
     
-    public List<Spots> findByStatusAndIsReservable(String status, Boolean isReservable){
+    public List<Spots> findByStatusAndIsReservable(SpotStatus status, Boolean isReservable){
         return spotsRepository.findByStatusAndIsReservable(status, isReservable);
     }
 

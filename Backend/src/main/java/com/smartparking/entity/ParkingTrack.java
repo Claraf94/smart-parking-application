@@ -65,7 +65,7 @@ public class ParkingTrack {
     public void setSpot(Spots spot) {
         this.spot = spot;
     }
-
+    
     public LocalDateTime getCheckIn() {
         return checkIn;
     }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.entity.Spots;
+import com.smartparking.enums.SpotStatus;
 import com.smartparking.service.SpotsService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ public class SpotsController {
     //returns all parking spots and can be filtered by its query parameter such as status
     @GetMapping("")
     public List<Spots> findSpots(
-        @RequestParam(required = false) String status,
+        @RequestParam(required = false) SpotStatus status,
         @RequestParam(required = false) Boolean isReservable
     ){
         if(status != null && isReservable != null){

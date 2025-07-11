@@ -22,12 +22,12 @@ public class ParkingTrackController {
     private ParkingTrackService parkingTrackService;
 
     //put the spot as occupied
-    @PutMapping("/checkin/{id}")
-    public ResponseEntity<String> checkinSpot(@PathVariable int id){
-        if(parkingTrackService.checkInSpot(id)){
-            return ResponseEntity.ok("Check in successful at the spot: " + id);
+    @PutMapping("/checkin/{spotCode}")
+    public ResponseEntity<String> checkinSpot(@PathVariable String spotCode){
+        if(parkingTrackService.checkInSpot(spotCode)){
+            return ResponseEntity.ok("Check in successful at the spot: " + spotCode);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check in failed at the spot: " + id);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check in failed at the spot: " + spotCode);
         }
     }
 
