@@ -14,12 +14,14 @@ public interface ParkingTrackRepository extends JpaRepository<ParkingTrack, Inte
     List<ParkingTrack> findByUser(Users user);
     //tracking parking usage by using the Spots entity reference
     List<ParkingTrack> findBySpot(Spots spot);
-    //tracking parking usage by check-in status
+    //retrieves all where check in was confirmed
     List<ParkingTrack> findByConfirmCheckInTrue();
-    //tracking parking usage by check-out status
+    //retrieves all where check out was confirmed
     List<ParkingTrack> findByConfirmCheckOutTrue();
-    //available parking spots that are not checked in
+    //retrieves all where check in has not been confirmed such as in reservations
     List<ParkingTrack> findByConfirmCheckInFalse();
-    //tracking parking spots that are empty
+    //checking for a spot that has not been checked in and has no check out (possibly available)
     Optional<ParkingTrack> findBySpotAndConfirmCheckInFalseAndCheckOutIsNull(Spots spot);
+    //checking active check in (spot checked in but not checked out yet)
+    Optional<ParkingTrack> findBySpotAndConfirmCheckInTrueAndCheckOutIsNull(Spots spot);
 }//parking track repository class

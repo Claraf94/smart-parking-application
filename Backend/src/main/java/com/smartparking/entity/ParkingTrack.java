@@ -31,7 +31,7 @@ public class ParkingTrack {
     private boolean confirmCheckIn = false; // default confirm check in status
     @Column(nullable = false) 
     private boolean confirmCheckOut = false; // default confirm check out status
-    
+
     //constructor
     public ParkingTrack(Users user, Spots spot) {
         this.user = user;

@@ -81,7 +81,7 @@ public class UsersController {
             if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
                 List<String> roles = List.of("ROLE_USER");
                 //separating message and token for clarity when tracking login attempts
-                return ResponseEntity.ok(Map.of("message", "Login successful, token generated " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
+                return ResponseEntity.ok(Map.of("message", "Login successful, token for authentication: " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
             }
         }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Invalid email or password"));

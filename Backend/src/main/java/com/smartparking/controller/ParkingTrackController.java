@@ -32,12 +32,12 @@ public class ParkingTrackController {
     }
 
     //put the spot as released
-    @PutMapping("/checkout/{id}")
-    public ResponseEntity<String> checkoutSpot(@PathVariable int id){
-        if(parkingTrackService.checkOutSpot(id)){
-            return ResponseEntity.ok("Check out successful at the spot: " + id);
+    @PutMapping("/checkout/{spotCode}")
+    public ResponseEntity<String> checkoutSpot(@PathVariable String spotCode){
+        if(parkingTrackService.checkOutSpot(spotCode)){
+            return ResponseEntity.ok("Check out successful at the spot: " + spotCode);
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check out failed at the spot: " + id);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Check out failed at the spot: " + spotCode);
         }
     }
 
