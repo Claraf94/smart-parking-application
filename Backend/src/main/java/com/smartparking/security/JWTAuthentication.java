@@ -5,7 +5,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -80,6 +80,9 @@ public class UsersController {
             Users user = existentUser.get();
             if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
                 List<String> roles = List.of("ROLE_USER");
+                if(user.getUserType() == UserType.ADMIN){
+                    roles.List.of("ROLE_USER", "ROLE_ADMIN");
+                }
                 //separating message and token for clarity when tracking login attempts
                 return ResponseEntity.ok(Map.of("message", "Login successful, token for authentication: " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
             }

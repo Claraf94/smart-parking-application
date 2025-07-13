@@ -25,7 +25,7 @@ public class ParkingTrack {
     private Spots spot; 
     @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime checkIn;//check in and check out time cannot be null
-    @Column(name = "checkOut", insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "checkOut", insertable = false,updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime checkOut;
     @Column(nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
 import com.smartparking.enums.ReservationStatus;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
@@ -15,7 +17,6 @@ public class Reservations {
     private int reservationID; //unique identifier for the reservation
     @ManyToOne //indicates a many-to-one relationship with the user entity
     @JoinColumn(name = "userID", nullable = false) //userID cannot be null
-    @NotNull(message = "User cannot be null")
     //instead of using userID, it is better to use the reference object to the users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;
@@ -30,12 +31,12 @@ public class Reservations {
     private String phoneNumber;
     @Column(nullable = false)
     @NotBlank(message = "Number plate cannot be blank")
+    @Pattern(regexp = "^\\d{2,3}-[A-Z]{1,2}-\\d{1,5}$", message = "Invalid number plate format.") //Ireland number plate format
     private String numberPlate;
     @Column(nullable = false) //start, end and reservedAt times cannot be null
     @NotNull(message = "Start time cannot be null")
     private LocalDateTime startTime;
     @Column(nullable = false) 
-    @NotNull(message = "End time cannot be null")
     private LocalDateTime endTime;
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime reservedAt;

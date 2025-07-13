@@ -2,11 +2,13 @@ package com.smartparking.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
+import com.smartparking.enums.ReservationStatus;
 
 @Repository
 public interface ReservationsRepository extends JpaRepository<Reservations, Integer> {
@@ -15,7 +17,14 @@ public interface ReservationsRepository extends JpaRepository<Reservations, Inte
     //find a reservation by using the Spots entity reference
     List<Reservations> findBySpot(Spots spot);
     //find a reservation by the reservation status
-    List<Reservations> findByReservationStatus(String reservationStatus);
-    //check if a reservation exists by using the Spots entity reference and the start and end times
-    boolean existsBySpotAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(Spots spot, LocalDateTime startTime, LocalDateTime endTime);
+    List<Reservations> findByReservationStatus(ReservationStatus reservationStatus);
+    //check if a reservation exists and it is ACTIVE
+    List<Reservations> findBySpotAndReservationStatus(Spots spot, ReservationStatus reservationStatus);
+    List<Reservations> findBySpotAndUserAndReservationStatus(Spots spot, Users user, ReservationStatus reservationStatus);
+    //check the active reservation of the user
+    Optional<Reservations> findFirstBySpotAndUserAndReservationStatusOrderByStartTimeDesc(Spots spot, Users user, ReservationStatus reservationStatus);
+    //check the upcoming reservation 
+    Optional<Reservations> findFirstBySpotAndReservationStatusAndStartTimeAfterOrderByStartTimeAsc(Spots spot, ReservationStatus status, LocalDateTime now);
+    //check for the last reservation related to a specific user
+    Optional<Reservations> findFirstByUserAndReservationStatusOrderByStartTimeDesc(Users user, ReservationStatus status);
 }//reservations repository class

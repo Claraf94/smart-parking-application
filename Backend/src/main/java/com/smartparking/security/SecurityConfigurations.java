@@ -1,5 +1,6 @@
 package com.smartparking.security;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 // this class configures the security settings for the application, disabling
 // CSRF protection and defining authorization rules for HTTP requests
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfigurations {
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter; // injects the JWT authentication filter to handle

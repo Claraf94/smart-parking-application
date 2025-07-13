@@ -2,8 +2,10 @@ package com.smartparking.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Users;
-import com.smartparking.exceptions.PlatformExceptions.ReservationConflictException;
+import com.smartparking.enums.ReservationStatus;
 import com.smartparking.service.ReservationsService;
 import com.smartparking.service.SpotsService;
+import com.smartparking.service.UsersService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/reservations")
@@ -25,29 +29,46 @@ public class ReservationsController {
     private ReservationsService reservationsService;
     @Autowired
     private SpotsService spotsService;
+    @Autowired
+    private UsersService usersService;
 
     //create a new reservations
     @PostMapping("/create")
-    public ResponseEntity<Reservations> createReservation(@RequestBody Reservations reservation) {
-        try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(reservationsService.createReservation(reservation));
-        }catch (IllegalArgumentException | ReservationConflictException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    public ResponseEntity<Reservations> createReservation(@RequestBody @Valid Reservations reservation) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Users user = usersService.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
+        reservation.setUser(user);
+        if(reservation.getReservationStatus() == null){
+            reservation.setReservationStatus(ReservationStatus.ACTIVE);
         }
+        Reservations savedReservation = reservationsService.createReservation(reservation);
+        return ResponseEntity.ok(savedReservation);
     }
 
     //returns reservation by user
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/{userId}")
-    public List<Reservations> getReservationsByUser(@PathVariable int userId) {
-        if(userId<=0){
+    public ResponseEntity<List<Reservations>> getReservationsByUser(@PathVariable int userId) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Invalid user ID.");
         }
         Users user = new Users();
-        user.setUserID(userId); 
-        return reservationsService.findByUser(user);
+        user.setUserID(userId);
+        return ResponseEntity.ok(reservationsService.findByUser(user));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<Reservations>> getLoggedUserReservations() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Users user = usersService.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
+        return ResponseEntity.ok(reservationsService.findByUser(user));
     }
 
     //returns reservation by spot
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/spot/{spotId}")
     public List<Reservations> getReservationsBySpot(@PathVariable int spotId) {
         if(spotId <=0){
@@ -60,16 +81,22 @@ public class ReservationsController {
     }
 
     //returns reservation by status
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/status/{status}")
     public List<Reservations> getReservationsByStatus(@PathVariable String status) {
-        return reservationsService.findByReservationStatus(status);
+        try{
+            ReservationStatus enumStatus = ReservationStatus.valueOf(status.toUpperCase());
+            return reservationsService.findByReservationStatus(enumStatus);
+        }catch(IllegalArgumentException e){
+            throw new IllegalArgumentException("Invalid status.");
+        }
     }
 
     //delete a reservation by ID
-    @DeleteMapping("/delete/{reservationId}")
+    @DeleteMapping("/cancel/{reservationId}")
     //response body will be void/empty 
     public ResponseEntity<Void> deleteReservation(@PathVariable int reservationId) {
-        reservationsService.deleteReservation(reservationId);
+        reservationsService.cancelReservation(reservationId);
         return ResponseEntity.noContent().build();
     }
 }//reservations controller class

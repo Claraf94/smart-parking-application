@@ -53,13 +53,9 @@ public class ParkingTrackController {
     }
     
     //returns parking activity for a specific spot by its ID
-    @GetMapping("/spots/{spotsId}")
-    public List<ParkingTrack> getBySpot(@PathVariable int spotsId){
-        if(spotsId <=0){
-            throw new IllegalArgumentException("Invalid type of ID.");
-        }
-        Spots spot = new Spots();
-        spot.setSpotsID(spotsId);
+    @GetMapping("/spots/{spotCode}")
+    public List<ParkingTrack> getBySpot(@PathVariable String spotCode){
+        Spots spot = parkingTrackService.findSpotBySpotCode(spotCode);
         return parkingTrackService.getBySpot(spot);
     }
 
