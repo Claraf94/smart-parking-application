@@ -15,8 +15,7 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int notificationID; //unique identifier for the notification
     @ManyToOne //indicates a many-to-one relationship with the Users entity
-    @JoinColumn(name = "userID", nullable = false)
-    @NotNull(message = "User cannot be null") //user cannot be null
+    @JoinColumn(name = "userID", nullable = true)
     //instead of using userID, it is better to use the reference object to the users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;

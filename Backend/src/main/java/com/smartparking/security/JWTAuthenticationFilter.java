@@ -1,7 +1,11 @@
 package com.smartparking.security;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,9 +32,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtAuthentication.getUsernameFromToken(jwt);
                 //if the username is existent and the token is a valid one, then authenticate the user
                 if (username != null && jwtAuthentication.validateToken(jwt, username)){
-                    // Set the authentication in the security context
+                    //retrieving roles 
+                    List<String> roles = jwtAuthentication.getRolesFromToken(jwt);
+                    List<SimpleGrantedAuthority> authority = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+                    //set the authentication in the security context according to the roles
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            username, null, null);
+                            username, null, authority);
                             SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     response .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");

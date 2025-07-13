@@ -79,15 +79,13 @@ public class UsersController {
         if (existentUser.isPresent()){
             Users user = existentUser.get();
             if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
-                List<String> roles = List.of("ROLE_USER");
-                if(user.getUserType() == UserType.ADMIN){
-                    roles.List.of("ROLE_USER", "ROLE_ADMIN");
-                }
+                String role = user.getUserType() == UserType.ADMIN ? "ROLE_ADMIN": "ROLE_USER";
+                List<String> roles = List.of(role);
                 //separating message and token for clarity when tracking login attempts
                 return ResponseEntity.ok(Map.of("message", "Login successful, token for authentication: " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
             }
         }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Invalid email or password"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Invalid email or password"));
     }
 
     @PostMapping("/logout")

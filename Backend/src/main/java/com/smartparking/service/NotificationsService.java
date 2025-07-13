@@ -1,12 +1,12 @@
 package com.smartparking.service;
 
-import com.smartparking.entity.Notifications;
-import com.smartparking.entity.Users;
-import com.smartparking.enums.NotificationType;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.smartparking.entity.Notifications;
+import com.smartparking.entity.Users;
+import com.smartparking.enums.NotificationType;
 import com.smartparking.repository.NotificationsRepository;
 import com.smartparking.repository.UsersRepository;
 
@@ -21,8 +21,10 @@ public class NotificationsService{
     //create a new notification. not applied for when there is a fine
     public Notifications createNotification(Users user, NotificationType type, String message) {
         //verifying if the users exists on the database 
-        if(user == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
-            throw new IllegalArgumentException("User does not exist on the database.");
+        if (user != null) {
+            if (user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
+                throw new IllegalArgumentException("User does not exist on the database.");
+            }
         }
 
         Notifications notification = new Notifications();
