@@ -28,7 +28,7 @@ public interface ReservationsRepository extends JpaRepository<Reservations, Inte
     //check for the last reservation related to a specific user
     Optional<Reservations> findFirstByUserAndReservationStatusOrderByStartTimeDesc(Users user, ReservationStatus status);
     //check the user which the reservation is near to expire
-    List<Reservations> findByStatusAndCheckOutTime(String status, LocalDateTime startTime, LocalDateTime endTime);
+    List<Reservations> findByStatusAndCheckOutTimeBetween(String status, LocalDateTime startTime, LocalDateTime endTime);
     //check the user which the reservation expired
-    List<Reservations> findByStatusAndCheckOutTimeBefore(String status, LocalDateTime now);
+    List<Reservations> findByStatusAndCheckOutTimeBefore(String status, LocalDateTime time);
 }//reservations repository class

@@ -87,11 +87,15 @@ public class NotificationsService{
     }
 
     //personalized notification for user with automatic email sending
-    public Notifications createNotifiacationForUser(Users user, NotificationType type){
+    public Notifications createNotificationForUser(Users user, NotificationType type){
+        String message = getMessageForNotificationType(type);
+        return createNotificationForUser(user, type, message);
+    }
+
+    public Notifications createNotificationForUser(Users user, NotificationType type, String message) {
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
-        String message = getMessageForNotificationType(type);
         if(user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
             //send email notification
             setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
