@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Reservations;
 import com.smartparking.enums.NotificationType;
 import com.smartparking.enums.ReservationStatus;
@@ -29,7 +31,10 @@ public class ReservationScheduledService {
         for (Reservations res : expiring) {
             if(!notificationSentRepository.existsByReservationAndNotificationType(res, NotificationType.RESERVATION_EXPIRING)) {
                 // Create a notification for the user if it hasn't been sent yet
-                notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.", res);
+                Notifications notification = notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.", res);
+                if(notification != null) {
+                    System.out.println("Notification sent for expiring reservation: " + res.getReservationID());
+                }
             }
         }
         // Notify users about reservations that have expired
@@ -37,8 +42,11 @@ public class ReservationScheduledService {
         for (Reservations res : expired) {
             if(!notificationSentRepository.existsByReservationAndNotificationType(res, NotificationType.RESERVATION_EXPIRED)) {
                 // Create a notification for the user if it hasn't been sent yet
-                notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.", res);
+                Notifications notification = notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.", res);
+                if(notification != null) {
+                    System.out.println("Notification sent for expired reservation: " + res.getReservationID());
+                }
             }
         }
     }
-}
+}//reservation scheduled service class
