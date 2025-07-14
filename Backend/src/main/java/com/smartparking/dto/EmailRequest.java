@@ -1,6 +1,7 @@
 package com.smartparking.dto;
 
 public class EmailRequest {
+    //declare variables
     private String email;
 
     //constructor

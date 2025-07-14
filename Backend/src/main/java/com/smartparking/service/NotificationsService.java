@@ -2,6 +2,7 @@ package com.smartparking.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smartparking.entity.NotificationSent;
@@ -11,6 +12,7 @@ import com.smartparking.entity.Users;
 import com.smartparking.enums.NotificationType;
 import com.smartparking.repository.NotificationSentRepository;
 import com.smartparking.repository.NotificationsRepository;
+import com.smartparking.repository.ReservationsRepository;
 import com.smartparking.repository.UsersRepository;
 
 @Service //this class is a notification service component
@@ -21,6 +23,8 @@ public class NotificationsService{
     private UsersRepository usersRepository;
     @Autowired
     private NotificationSentRepository notificationSentRepository;
+    @Autowired
+    private ReservationsRepository reservationsRepository;
     @Autowired
     private SetEmailService setEmailService;
     private static final BigDecimal DEFAULT_FINE_AMOUNT = new BigDecimal("50.00");
@@ -159,5 +163,10 @@ public class NotificationsService{
                 //setEmailService.sendEmailConfig(user.getEmail(), subject, message);
             }
         }
+    }
+
+    public Optional<Reservations> findReservationById(int reservationID) {
+        //find a reservation by its ID
+        return reservationsRepository.findById(reservationID);
     }
 }//notifications service class

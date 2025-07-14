@@ -2,6 +2,7 @@ package com.smartparking.dto;
 
 
 public class GeneralNotifications {
+    //declare variables
     private String message;
     private String subject;
     

@@ -2,6 +2,7 @@ package com.smartparking.dto;
 
 // This class represents a request to reset a user's password.
 public class PasswordResetRequest {
+    //declare variables
     private String tokenPassword;
     private String newPassword;
     private String email;

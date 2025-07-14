@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.smartparking.dto.GeneralNotifications;
 import com.smartparking.entity.Notifications;
+import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Users;
 import com.smartparking.service.NotificationsService;
 import com.smartparking.service.UsersService;
@@ -44,6 +45,24 @@ public class NotificationsController {
             }
             notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage());
             return ResponseEntity.status(HttpStatus.CREATED).body(notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage()));
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    //creating a notification associated with a reservation
+    @PostMapping("/create/reservation")
+    public ResponseEntity<Notifications> createNotificationForReservation(@RequestBody Notifications notification) {
+        try{
+            int userID = notification.getUser().getUserID();
+            int reservationID = notification.getReservation().getReservationID();
+            Optional<Users> user = usersService.findById(userID);
+            Optional<Reservations> reservation = notificationsService.findReservationById(reservationID);
+            if(user.isEmpty() || reservation.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            Notifications createdNotification = notificationsService.createNotificationForUser(user.get(), notification.getNotificationType(), notification.getTextMessage(), reservation.get());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdNotification);
         }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }

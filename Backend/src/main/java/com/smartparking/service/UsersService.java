@@ -49,6 +49,11 @@ public class UsersService {
         return usersRepository.findByUserType(userT);
     }
 
+    public Optional<Users> findById(int userID) {
+        //find a user by its ID
+        return usersRepository.findById(userID);
+    }
+
     public Users save(Users user){
         //update and save user info
         return usersRepository.save(user);
