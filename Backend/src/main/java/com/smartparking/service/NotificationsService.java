@@ -109,27 +109,29 @@ public class NotificationsService{
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
-        if(reservation != null){
-            if(notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
+        if(reservation != null && notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
                 return null; // Notification already sent for this reservation and type
             }
+            Notifications notification = new Notifications();
+            notification.setUser(user);
+            notification.setNotificationType(type);
+            notification.setTextMessage(message);
+            notification.setFine(BigDecimal.ZERO);
+            notification.setIsPaid(false);
+            Notifications savedNotification = notificationsRepository.save(notification);
+           
             if(shouldSendNotification(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
                 setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
             }
-            //save the notification as sent
-            NotificationSent notificationSent = new NotificationSent();
-            notificationSent.setReservation(reservation);
-            notificationSent.setNotificationType(type);
-            notificationSentRepository.save(notificationSent);
-        }
-        //for cases where reservation is null, we can still create a notification
-        Notifications notification = new Notifications();
-        notification.setUser(user);
-        notification.setNotificationType(type);
-        notification.setTextMessage(message);
-        notification.setFine(BigDecimal.ZERO);
-        notification.setIsPaid(false);
-        return notificationsRepository.save(notification);
+
+            if(reservation != null) {
+                //save the notification as sent
+                NotificationSent notificationSent = new NotificationSent();
+                notificationSent.setReservation(reservation);
+                notificationSent.setNotificationType(type);
+                notificationSentRepository.save(notificationSent);
+            }
+            return savedNotification;
     }
 
     //mark a fine as paid
