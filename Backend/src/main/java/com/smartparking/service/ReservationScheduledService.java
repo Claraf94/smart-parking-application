@@ -16,7 +16,7 @@ public class ReservationScheduledService {
     private NotificationsService notificationsService;
     @Autowired
     private ReservationsRepository reservationsRepository;
-    @Scheduled(cron = "0 * * * * ?") // Every minute
+    //@Scheduled(cron = "0 * * * * ?") // Every minute
 
     public void notifyAboutReservations() {
         // Notify users about reservations that are about to expire
@@ -24,7 +24,11 @@ public class ReservationScheduledService {
         LocalDateTime endTime = now.plusMinutes(10);
         List<Reservations> expiring = reservationsRepository.findByReservationStatusAndEndTimeBetween(ReservationStatus.ACTIVE, now, endTime);
         for (Reservations res : expiring) {
-            notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.");
+            if(!res.isNotificationSent()){
+                notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.");
+            }
+            res.setNotificationSent(true); // Mark as notification sent
+            reservationsRepository.save(res); // Save the updated reservation
         }
 
         // Notify users about reservations that have expired

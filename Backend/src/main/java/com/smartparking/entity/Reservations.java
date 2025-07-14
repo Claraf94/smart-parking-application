@@ -45,6 +45,8 @@ public class Reservations {
     @NotNull(message = "Reservation status cannot be null")
     private ReservationStatus reservationStatus = ReservationStatus.ACTIVE; // default reservation status
 
+// getters e setters para cada um
+
     //getters and setters
     public int getReservationID() {
         return reservationID;
@@ -114,6 +116,14 @@ public class Reservations {
         this.reservationStatus = reservationStatus;
     }
 
+    public boolean isNotificationSent() {
+        return notificationSent;
+    }
+
+    public void setNotificationSent(boolean notificationSent) {
+        this.notificationSent = notificationSent;
+    }
+
     @Override
     public String toString() {  
         return "Reservation details:\n" +
@@ -125,6 +135,7 @@ public class Reservations {
                ", Start Time: " + startTime +
                ", End Time: " + endTime +
                ", Reserved at: " + reservedAt +
-               ", Status: " + reservationStatus;
+               ", Status: " + reservationStatus + 
+               ", User notified: " + notificationSent;
     }
 }//reservation class

@@ -27,7 +27,7 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/register", "/users/login", "/error", "/resetPassword/**", "/users/resetTokenPassword")
+                        .requestMatchers("/users/register", "/users/login", "/error", "/resetPassword/**", "/users/resetTokenPassword", "/v3/api-docs/**","/swagger-ui.html", "/swagger-ui/**")
                         .permitAll()
                         .requestMatchers("/v3/api-docs/*", "/swagger-ui/*", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated());
