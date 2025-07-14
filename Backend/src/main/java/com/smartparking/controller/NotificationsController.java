@@ -2,6 +2,7 @@ package com.smartparking.controller;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Users;
 import com.smartparking.service.NotificationsService;
+import com.smartparking.service.SetEmailService;
 import com.smartparking.service.UsersService;
 
 
@@ -31,27 +33,30 @@ public class NotificationsController {
     private NotificationsService notificationsService;
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private SetEmailService setEmailService;
 
     //creating a notification
     @PostMapping("/create")
     public ResponseEntity<Notifications> createNotification(@RequestBody Notifications notification) {
         try{
-            Users user = notification.getUser();
-            if(user != null && user.getUserID() != 0) {
-                user = new Users();
-                user.setUserID(notification.getUser().getUserID());
-            }else{
-                user = null;
+            Users user = null;
+            if(notification.getUser() != null && notification.getUser().getUserID() != 0) {
+                Optional<Users> registeredUser = usersService.findById(notification.getUser().getUserID());
+               if(registeredUser.isEmpty()) {
+                   return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+               }
+                user = registeredUser.get();
             }
-            notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage());
-            return ResponseEntity.status(HttpStatus.CREATED).body(notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage()));
+            Notifications createdNotifications = notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdNotifications);
         }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }
     }
 
     //creating a notification associated with a reservation
-    @PostMapping("/create/reservation")
+    @PostMapping("/create/reservation-notification")
     public ResponseEntity<Notifications> createNotificationForReservation(@RequestBody Notifications notification) {
         try{
             int userID = notification.getUser().getUserID();
@@ -103,5 +108,4 @@ public class NotificationsController {
         notificationsService.sendNotificationToAllUsers(request.getMessage(), request.getSubject());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 }//notifications controller class

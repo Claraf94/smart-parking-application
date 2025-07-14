@@ -72,7 +72,12 @@ public class NotificationsService{
         notification.setTextMessage(message);
         notification.setFine(BigDecimal.ZERO);
         notification.setIsPaid(false);
-        return notificationsRepository.save(notification);
+        Notifications savedNotification = notificationsRepository.save(notification);
+        
+        if(shouldSendNotification(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
+        }
+        return savedNotification;
     }
 
     //create a new notification related to a fine application
