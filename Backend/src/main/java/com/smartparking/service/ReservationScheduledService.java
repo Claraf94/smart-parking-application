@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.smartparking.entity.Reservations;
 import com.smartparking.enums.NotificationType;
+import com.smartparking.enums.ReservationStatus;
 import com.smartparking.repository.ReservationsRepository;
 
 @Component
@@ -21,13 +22,13 @@ public class ReservationScheduledService {
         // Notify users about reservations that are about to expire
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endTime = now.plusMinutes(10);
-        List<Reservations> expiring = reservationsRepository.findByStatusAndCheckOutTimeBetween("CHECKED_IN", now, endTime);
+        List<Reservations> expiring = reservationsRepository.findByReservationStatusAndCheckOutTimeBetween(ReservationStatus.ACTIVE, now, endTime);
         for (Reservations res : expiring) {
             notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.");
         }
 
         // Notify users about reservations that have expired
-        List<Reservations> expired = reservationsRepository.findByStatusAndCheckOutTimeBefore("CHECKED_IN", now);
+        List<Reservations> expired = reservationsRepository.findByReservationStatusAndCheckOutTimeBefore(ReservationStatus.ACTIVE, now);
         for (Reservations res : expired) {
             notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.");
         }
