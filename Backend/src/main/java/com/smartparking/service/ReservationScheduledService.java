@@ -22,13 +22,13 @@ public class ReservationScheduledService {
         // Notify users about reservations that are about to expire
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endTime = now.plusMinutes(10);
-        List<Reservations> expiring = reservationsRepository.findByReservationStatusAndCheckOutTimeBetween(ReservationStatus.ACTIVE, now, endTime);
+        List<Reservations> expiring = reservationsRepository.findByReservationStatusAndEndTimeBetween(ReservationStatus.ACTIVE, now, endTime);
         for (Reservations res : expiring) {
             notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRING, "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.");
         }
 
         // Notify users about reservations that have expired
-        List<Reservations> expired = reservationsRepository.findByReservationStatusAndCheckOutTimeBefore(ReservationStatus.ACTIVE, now);
+        List<Reservations> expired = reservationsRepository.findByReservationStatusAndEndTimeBefore(ReservationStatus.ACTIVE, now);
         for (Reservations res : expired) {
             notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.");
         }
