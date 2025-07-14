@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -16,8 +17,9 @@ public class ReservationNotificationSent {
     //declare variables
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int sentNotificationId; // unique identifier for the notification sent
+    private int sentNotificationID; // unique identifier for the notification sent
     @ManyToOne // indicates a many-to-one relationship with the Reservations entity
+    @JoinColumn(name = "reservationID", nullable = false) // reservationID cannot be null
     private Reservations reservation; // the reservation for which the notification was sent
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType; // type of notification sent
@@ -25,12 +27,12 @@ public class ReservationNotificationSent {
     private LocalDateTime sentAt; // timestamp when the notification was sent
 
     //getters and setters
-    public int getSentNotificationId() {
-        return sentNotificationId;
+    public int getSentNotificationID() {
+        return sentNotificationID;
     }
 
-    public void setSentNotificationId(int sentNotificationId) {
-        this.sentNotificationId = sentNotificationId;
+    public void setSentNotificationID(int sentNotificationID) {
+        this.sentNotificationID = sentNotificationID;
     }
 
     public Reservations getReservation() {
@@ -56,7 +58,7 @@ public class ReservationNotificationSent {
     @Override
     public String toString() {
         return "Notification details:\n" +
-                "Id: " + sentNotificationId +
+                "Id: " + sentNotificationID +
                 ", Reservation: " + reservation +
                 ", Type: " + notificationType +
                 ", Sent at: " + sentAt;

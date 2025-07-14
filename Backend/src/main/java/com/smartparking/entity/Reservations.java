@@ -116,14 +116,6 @@ public class Reservations {
         this.reservationStatus = reservationStatus;
     }
 
-    public boolean isNotificationSent() {
-        return notificationSent;
-    }
-
-    public void setNotificationSent(boolean notificationSent) {
-        this.notificationSent = notificationSent;
-    }
-
     @Override
     public String toString() {  
         return "Reservation details:\n" +
@@ -135,7 +127,6 @@ public class Reservations {
                ", Start Time: " + startTime +
                ", End Time: " + endTime +
                ", Reserved at: " + reservedAt +
-               ", Status: " + reservationStatus + 
-               ", User notified: " + notificationSent;
+               ", Status: " + reservationStatus;
     }
 }//reservation class

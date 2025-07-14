@@ -1,18 +1,10 @@
 package com.smartparking.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import com.smartparking.entity.Reservations;
-import com.smartparking.enums.NotificationType;
-import com.smartparking.enums.ReservationStatus;
-import com.smartparking.repository.ReservationsRepository;
 
 @Component
 public class ReservationScheduledService {
-    @Autowired
+   /* @Autowired
     private NotificationsService notificationsService;
     @Autowired
     private ReservationsRepository reservationsRepository;
@@ -36,5 +28,5 @@ public class ReservationScheduledService {
         for (Reservations res : expired) {
             notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.");
         }
-    }
+    }*/
 }
