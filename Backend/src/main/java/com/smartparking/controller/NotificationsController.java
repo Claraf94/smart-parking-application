@@ -2,7 +2,6 @@ package com.smartparking.controller;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +12,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.smartparking.dto.GeneralNotifications;
 import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Users;
 import com.smartparking.service.NotificationsService;
 import com.smartparking.service.UsersService;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -34,34 +35,33 @@ public class NotificationsController {
     //creating a notification
     @PostMapping("/create")
     public ResponseEntity<Notifications> createNotification(@RequestBody Notifications notification) {
-        if(notification.getUser() != null && notification.getUser().getUserID() != 0) {
-            //if the user is not null and the user ID is not 0, then the notification can be created
-            //ensuring that the user is valid before creating a notification
-            Users user = new Users();
-            //setting the user ID for the notification
-            //this is necessary to link the notification to the user who will receive it
-            user.setUserID(notification.getUser().getUserID());
+        try{
+            Users user = notification.getUser();
+            if(user != null && user.getUserID() != 0) {
+                user = new Users();
+                user.setUserID(notification.getUser().getUserID());
+            }else{
+                user = null;
+            }
+            notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage());
             return ResponseEntity.status(HttpStatus.CREATED).body(notificationsService.createNotification(user, notification.getNotificationType(), notification.getTextMessage()));
-        }else{
+        }catch(IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }
     }
 
     //get a list with unpaid fines
-    @GetMapping("unpaid-fines")
+    @GetMapping("/unpaid-fines")
     public ResponseEntity<List<Notifications>> getUnpaidFines(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null){
+        if(authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if(authentication.getName() == null || authentication.getName().isBlank()){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Optional<Users> userOptional = usersService.findByEmail(authentication.getName());
-        if(userOptional.isEmpty()){
+        Optional<Users> user = usersService.findByEmail(authentication.getName());
+        if(user.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(notificationsService.getUnpaidFines(userOptional.get()));
+        return ResponseEntity.ok(notificationsService.getUnpaidFines(user.get()));
     }
 
     //confirm a fine was paid 
@@ -71,9 +71,19 @@ public class NotificationsController {
         try{
             return ResponseEntity.ok(notificationsService.markAsPaid(id));
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
+    
+    //sending a general notification to all users
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/general")
+    public ResponseEntity<Void> sendGeneralNotification(@RequestBody GeneralNotifications request) {
+        if(request.getMessage() == null || request.getMessage().isBlank() || request.getSubject() == null || request.getSubject().isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        notificationsService.sendNotificationToAllUsers(request.getMessage(), request.getSubject());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
 }//notifications controller class

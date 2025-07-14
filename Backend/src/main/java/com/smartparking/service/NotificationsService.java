@@ -16,11 +16,41 @@ public class NotificationsService{
     private NotificationsRepository notificationsRepository;
     @Autowired
     private UsersRepository usersRepository;
-    private static final BigDecimal DEFAULT_FINE_AMOUNT = new BigDecimal("20.00");
+    @Autowired
+    private SetEmailService setEmailService;
+    private static final BigDecimal DEFAULT_FINE_AMOUNT = new BigDecimal("50.00");
+    
+    //get the message according to the notification type
+    private String getMessageForNotificationType(NotificationType type) {
+        switch (type) {
+            case SPOT_NOT_AVAILABLE:
+                return "This spot is not available.";
+            case SPOT_RESERVED_VIOLATION:
+                return "You occupied a reserved spot without permission.";
+            case SPOT_RESERVED:
+                return "Your have successfully reserved a parking spot.";
+            case RESERVATION_EXPIRING:
+                return "Attention! Your reservation is about to expire.";
+            case RESERVATION_EXPIRED:
+                return "Attention! Your time to occupy the reserved spot has expired.";
+            case RESERVATION_CANCELLED:
+                return "Your reservation has been cancelled.";
+            case RESERVATION_NOT_POSSIBLE:
+                return "Your reservation is not possible at this time.";
+            case UNAUTHORIZED_CHECKIN:
+                return "You are not authorized to check in at this spot.";
+            case FINE_APPLIED:
+                return "A fine has been applied to your account.";
+            case GENERAL_INFORMATION:
+                return "You have a new notification.";
+            default:
+                return "You have a new notification.";
+        }
+    }
 
     //create a new notification. not applied for when there is a fine
     public Notifications createNotification(Users user, NotificationType type, String message) {
-        //verifying if the users exists on the database 
+        //verifying if the users exists on the database in case this is provided
         if (user != null) {
             if (user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
                 throw new IllegalArgumentException("User does not exist on the database.");
@@ -49,47 +79,22 @@ public class NotificationsService{
         notification.setTextMessage("A fine of € "+ DEFAULT_FINE_AMOUNT + " has been applied to your account due to problems following the parking rules.");
         notification.setFine(DEFAULT_FINE_AMOUNT);
         notification.setIsPaid(false);
+        //send email notification
+        if(user.getEmail() != null && !user.getEmail().isBlank()) {
+            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification - Fine Applied", notification.getTextMessage());
+        }
         return notificationsRepository.save(notification);
     }
 
-    //personalized notification for user
-    public Notifications createNotificationForUser(Users user, NotificationType type){
-        if(user == null || type == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
-            throw new IllegalArgumentException("User and Notification type must not be null and user must exists.");
+    //personalized notification for user with automatic email sending
+    public Notifications createNotifiacationForUser(Users user, NotificationType type){
+        if(type == null) {
+            throw new IllegalArgumentException("Notification type must not be null.");
         }
-        
-        String message = "";
-        switch (type) {
-            case SPOT_NOT_AVAILABLE:
-                message = "This spot is not available.";
-                break;
-            case SPOT_RESERVED_VIOLATION:
-                message = "You occupied a reserved spot without permission.";
-                break;
-            case SPOT_RESERVED:
-                message = "Your have successfully reserved a parking spot.";
-                break;
-            case RESERVATION_EXPIRED:
-                message = "Your time to occupy the reserved spot has expired.";
-                break;  
-            case RESERVATION_CANCELLED:
-                message = "Your reservation has been cancelled.";
-                break;
-            case RESERVATION_NOT_POSSIBLE:
-                message = "Your reservation is not possible at this time.";             
-                break;
-            case UNAUTHORIZED_CHECKIN:
-                message = "You are not authorized to check in at this spot.";
-                break;
-            case FINE_APPLIED:
-                message = "A fine has been applied to your account.";       
-                break;
-            case GENERAL_INFORMATION:
-                message = "You have a new notification.";
-                break;
-            default:
-                message = "You have a new notification.";
-                break;
+        String message = getMessageForNotificationType(type);
+        if(user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+            //send email notification
+            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
         }
         return createNotification(user, type, message);
     }
@@ -116,5 +121,17 @@ public class NotificationsService{
             return notificationsRepository.findByUserAndIsPaidFalseAndFineGreaterThan(user, BigDecimal.ZERO);
         }
         throw new IllegalArgumentException("User must have a valid ID and not be empty.");
+    }
+
+    //sends a notification to all users
+    public void sendNotificationToAllUsers(String subject, String message) {
+        createNotification(null, NotificationType.GENERAL_INFORMATION, message);
+        //search for all users in the database
+        List<Users> everyUser = usersRepository.findAll();
+        for (Users user : everyUser) {
+            if(user.getEmail() != null && !user.getEmail().isBlank()) {
+                setEmailService.sendEmailConfig(user.getEmail(), subject, message);
+            }
+        }
     }
 }//notifications service class
