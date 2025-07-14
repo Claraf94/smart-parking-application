@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import com.smartparking.dto.GeneralNotifications;
 import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Users;

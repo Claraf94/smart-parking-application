@@ -19,10 +19,8 @@ public class Notifications {
     //instead of using userID, it is better to use the reference object to the users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;
-    @ManyToOne //indicates a many-to-one relationship with the Reservations entity
-    @JoinColumn(name = "reservationID", nullable = true)
-    //instead of using reservationID, it is better to use the reference object to the Reservations entity
-    //allowing for better encapsulation and better management of relationships in the database
+    @ManyToOne // indicates a many-to-one relationship with the Reservations entity
+    @JoinColumn(name = "reservationID", nullable = false) // reservationID cannot be null
     private Reservations reservation;
     @Column(nullable = false) //text message cannot be null
     @NotBlank(message = "Text message cannot be blank")
@@ -116,7 +114,8 @@ public class Notifications {
         return "Notification ID: " + notificationID +
                ", User: " + (user != null ? user.getFirstName() + " " + user.getLastName() : "Not available.") +
                ", Message: " + textMessage +
-                ", Type: " + notificationType +
+               ", Reservation ID: " + (reservation != null ? reservation.getReservationID() : "Not available.") +
+               ", Type: " + notificationType +
                ", Fine: " + fine +
                ", Paid: " + isPaid +
                ", Created: " + created;
