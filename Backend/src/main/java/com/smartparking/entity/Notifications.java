@@ -19,6 +19,11 @@ public class Notifications {
     //instead of using userID, it is better to use the reference object to the users entity
     //allowing for better encapsulation and better management of relationships in the database
     private Users user;
+    @ManyToOne //indicates a many-to-one relationship with the Reservations entity
+    @JoinColumn(name = "reservationID", nullable = true)
+    //instead of using reservationID, it is better to use the reference object to the Reservations entity
+    //allowing for better encapsulation and better management of relationships in the database
+    private Reservations reservation;
     @Column(nullable = false) //text message cannot be null
     @NotBlank(message = "Text message cannot be blank")
     private String textMessage;
@@ -61,6 +66,14 @@ public class Notifications {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public Reservations getReservation() {
+        return reservation;
+    }
+    
+    public void setReservation(Reservations reservation) {
+        this.reservation = reservation;
     }
 
     public String getTextMessage() {

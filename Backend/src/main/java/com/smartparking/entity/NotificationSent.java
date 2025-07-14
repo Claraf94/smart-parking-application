@@ -1,11 +1,21 @@
 package com.smartparking.entity;
 
+import java.time.LocalDateTime;
+import com.smartparking.enums.NotificationType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "notificationSent") // specifies the name of the table in the database
+@Table(name = "notificationSent", uniqueConstraints = @UniqueConstraint(columnNames = {"reservationID", "notificationType"})) // specifies the name of the table in the database
 public class NotificationSent {
     //declare variables
     @Id

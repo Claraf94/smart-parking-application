@@ -2,11 +2,15 @@ package com.smartparking.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import javax.management.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.smartparking.entity.NotificationSent;
 import com.smartparking.entity.Notifications;
+import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Users;
 import com.smartparking.enums.NotificationType;
+import com.smartparking.repository.NotificationSentRepository;
 import com.smartparking.repository.NotificationsRepository;
 import com.smartparking.repository.UsersRepository;
 
@@ -16,6 +20,8 @@ public class NotificationsService{
     private NotificationsRepository notificationsRepository;
     @Autowired
     private UsersRepository usersRepository;
+    @Autowired
+    private NotificationSentRepository notificationSentRepository;
     @Autowired
     private SetEmailService setEmailService;
     private static final BigDecimal DEFAULT_FINE_AMOUNT = new BigDecimal("50.00");
@@ -96,9 +102,18 @@ public class NotificationsService{
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
+        Notifications notification = createNotification(user, type, message);
+        Reservations reservation = notification.getReservation();
         if(user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
-            //send email notification
-            //setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
+            if(reservation != null &&!notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
+                //send email notification
+                setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
+
+                NotificationSent notificationSent = new NotificationSent();
+                notificationSent.setReservation(reservation);
+                notificationSent.setNotificationType(type);
+                notificationSentRepository.save(notificationSent);
+            }
         }
         return createNotification(user, type, message);
     }
