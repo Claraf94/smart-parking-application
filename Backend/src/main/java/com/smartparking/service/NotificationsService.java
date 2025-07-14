@@ -98,7 +98,7 @@ public class NotificationsService{
         }
         if(user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
             //send email notification
-            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
+            //setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
         }
         return createNotification(user, type, message);
     }
@@ -134,7 +134,7 @@ public class NotificationsService{
         List<Users> everyUser = usersRepository.findAll();
         for (Users user : everyUser) {
             if(user.getEmail() != null && !user.getEmail().isBlank()) {
-                setEmailService.sendEmailConfig(user.getEmail(), subject, message);
+                //setEmailService.sendEmailConfig(user.getEmail(), subject, message);
             }
         }
     }

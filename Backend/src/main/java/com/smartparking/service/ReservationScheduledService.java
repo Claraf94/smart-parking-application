@@ -16,7 +16,7 @@ public class ReservationScheduledService {
     private NotificationsService notificationsService;
     @Autowired
     private ReservationsRepository reservationsRepository;
-    //@Scheduled(cron = "0 * * * * ?") // Every minute
+    @Scheduled(cron = "0 * * * * ?") // Every minute
 
     public void notifyAboutReservations() {
         // Notify users about reservations that are about to expire

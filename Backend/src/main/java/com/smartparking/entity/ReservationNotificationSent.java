@@ -1,22 +1,27 @@
 package com.smartparking.entity;
 
-import jakarta.annotation.Generated;
+import java.time.LocalDateTime;
+import com.smartparking.enums.NotificationType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class ReservationNotificationSent {
     //declare variables
     @Id
-    @GeneratedValue(strategy = GeneratedType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sentNotificationId; // unique identifier for the notification sent
     @ManyToOne // indicates a many-to-one relationship with the Reservations entity
     private Reservations reservation; // the reservation for which the notification was sent
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType; // type of notification sent
+    @Column(name = "sentAt", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime sentAt; // timestamp when the notification was sent
 
     //getters and setters
@@ -46,5 +51,14 @@ public class ReservationNotificationSent {
 
     public LocalDateTime getSentAt() {
         return sentAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Notification details:\n" +
+                "Id: " + sentNotificationId +
+                ", Reservation: " + reservation +
+                ", Type: " + notificationType +
+                ", Sent at: " + sentAt;
     }
 }
