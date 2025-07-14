@@ -2,7 +2,6 @@ package com.smartparking.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import javax.management.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smartparking.entity.NotificationSent;
@@ -99,23 +98,31 @@ public class NotificationsService{
     }
 
     public Notifications createNotificationForUser(Users user, NotificationType type, String message) {
+        return createNotification(user, type, message);
+    }
+
+    public Notifications createNotificationForUser(Users user, NotificationType type, String message, Reservations reservation) {
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
-        Notifications notification = createNotification(user, type, message);
-        Reservations reservation = notification.getReservation();
-        if(user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
-            if(reservation != null &&!notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
-                //send email notification
-                setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
+        if(reservation != null && !notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
+            if(user !=null && user.getEmail() != null && !user.getEmail().isBlank()) {
+            //send email notification
+            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
 
-                NotificationSent notificationSent = new NotificationSent();
-                notificationSent.setReservation(reservation);
-                notificationSent.setNotificationType(type);
-                notificationSentRepository.save(notificationSent);
+            NotificationSent notificationSent = new NotificationSent();
+            notificationSent.setReservation(reservation);
+            notificationSent.setNotificationType(type);
+            notificationSentRepository.save(notificationSent);
             }
         }
-        return createNotification(user, type, message);
+        Notifications notification = new Notifications();
+        notification.setUser(user);
+        notification.setNotificationType(type);
+        notification.setTextMessage(message);
+        notification.setFine(BigDecimal.ZERO);
+        notification.setIsPaid(false);
+        return notificationsRepository.save(notification);
     }
 
     //mark a fine as paid
