@@ -24,22 +24,42 @@ public class ParkingTrack {
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot; 
     @Column(name = "checkIn", nullable = true)
-    private LocalDateTime checkIn;//check in and check out time cannot be null
-    @Column(name = "checkOut", nullable = true) //check out time can be null
+    private LocalDateTime checkIn;
+    @Column(name = "checkOut", nullable = true)
     private LocalDateTime checkOut;
-    @Column(nullable = false) //confirm check in and confirm check out cannot be null
+    @Column(name = "confirmCheckIn", nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status
-    @Column(nullable = false) 
+    @Column(name = "confirmCheckOut", nullable = false) 
     private boolean confirmCheckOut = false; // default confirm check out status
     @ManyToOne
     @JoinColumn(name = "reservationID", nullable = true)
     private Reservations reservation; //optional relationship with Reservations entity
 
     //constructor
-    public ParkingTrack(Users user, Spots spot) {
+    public ParkingTrack(Users user, Spots spot, LocalDateTime checkIn, LocalDateTime checkOut, boolean confirmCheckIn, boolean confirmCheckOut, Reservations reservation) {
         this.user = user;
         this.spot = spot;
-    }   
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.confirmCheckIn = confirmCheckIn;
+        this.confirmCheckOut = confirmCheckOut;
+        this.reservation = reservation;
+    }
+    //constructor without reservation
+    public ParkingTrack(Users user, Spots spot, LocalDateTime checkIn, LocalDateTime checkOut, boolean confirmCheckIn, boolean confirmCheckOut) {
+        this.user = user;
+        this.spot = spot;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.confirmCheckIn = confirmCheckIn;
+        this.confirmCheckOut = confirmCheckOut;
+    }
+
+    //basic constructor
+    public ParkingTrack(Users user, Spots spot){
+        this.user = user;
+        this.spot = spot;
+    }
 
     //default constructor
     public ParkingTrack(){}

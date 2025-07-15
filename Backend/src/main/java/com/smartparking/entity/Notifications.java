@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.smartparking.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +12,7 @@ import java.math.BigDecimal;
 
 @Entity //indicates that this class is an entity and is mapped to a database table
 @Table(name = "notifications") //specifies the name of the table in the database
-public class Notifications {
+public class Notifications { 
     //declare variables
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,28 +25,30 @@ public class Notifications {
     @ManyToOne // indicates a many-to-one relationship with the Reservations entity
     @JoinColumn(name = "reservationID", nullable = false) // reservationID cannot be null
     private Reservations reservation;
-    @Column(nullable = false) //text message cannot be null
+    @Column(name = "textMessage", nullable = false) //text message cannot be null
     @NotBlank(message = "Text message cannot be blank")
     private String textMessage;
     @Enumerated(EnumType.STRING) //specifies that the enum will be stored as a string in the database
-    @Column(nullable = false) //notification type cannot be null    
+    @Column(name = "notificationType", nullable = false) //notification type cannot be null
     @NotNull(message = "Notification type cannot be null")
     private NotificationType notificationType; //type of notification, e.g., SPOT_NOT_AVAILABLE, SPOT_RESERVED_VIOLATION, etc.
-    @Column(nullable = false) //fine cannot be null
+    @Column(name = "fine", nullable = false) //fine cannot be null
     @NotNull(message = "Fine cannot be null")
     private BigDecimal fine = BigDecimal.ZERO; //fine associated with the notification, default is zero
-    @Column(nullable = false) //isPaid cannot be null
-    private Boolean isPaid = false;
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP") //created time cannot be null
+    @Column(name = "isPaid", nullable = true)
+    private Boolean isPaid;
+    @CreationTimestamp
+    @Column(name = "created", nullable = false, updatable = false) //created time cannot be null
     private LocalDateTime created; //current time stamp
 
     //constructor
-    public Notifications(Users user, String textMessage, NotificationType notificationType, BigDecimal fine, Boolean isPaid) {
+    public Notifications(Users user, Reservations reservation, String textMessage, NotificationType notificationType, BigDecimal fine, Boolean isPaid) {
         this.user = user;
+        this.reservation = reservation;
         this.textMessage = textMessage;
         this.notificationType = notificationType;
         this.fine = fine;
-        this.isPaid =  isPaid;
+        this.isPaid = isPaid;
     }
 
     //default constructor

@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,13 +25,14 @@ public class ResetPassword {
     @JoinColumn(name = "userID", nullable = false) // userID cannot be null
     //instead of using userID, it is better to use the reference object to the users entity
     private Users user; //reference to the Users entity, allowing for better encapsulation and management of relationships in the database
-    @Column(nullable = false, unique = true) //token cannot be null and must be unique
+    @Column(name = "token", nullable = false, unique = true) //token cannot be null and must be unique
     @NotNull(message = "Token cannot be null")
     private String token;
-    @Column(nullable = false)//expiration time cannot be null
+    @Column(name = "expirationTime", nullable = false)//expiration time cannot be null
     @NotNull(message = "Expiration time cannot be null")
     private LocalDateTime expirationTime; //expiration time for the reset password request
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP") //created time cannot be null
+    @CreationTimestamp
+    @Column(name = "created", nullable = false, updatable = false)//created time cannot be null
     private LocalDateTime created; //current time stamp
 
     //constructor

@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,27 +29,43 @@ public class Reservations {
     //instead of using SpotID, it is better to use the reference object to the Spots entity
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot;
-    @Column(nullable = false) //phone number and number plate cannot be null
+    @Column(name = "phoneNumber", nullable = false) //phone number and number plate cannot be null
     @NotBlank(message = "Phone number cannot be blank")
     private String phoneNumber;
-    @Column(nullable = false)
+    @Column(name = "numberPlate", nullable = false)
     @NotBlank(message = "Number plate cannot be blank")
     @Pattern(regexp = "^\\d{2,3}-[A-Z]{1,2}-\\d{1,5}$", message = "Invalid number plate format.") //Ireland number plate format
     private String numberPlate;
-    @Column(nullable = false) //start, end and reservedAt times cannot be null
+    @Column(name = "startTime", nullable = false) //start, end and reservedAt times cannot be null
     @NotNull(message = "Start time cannot be null")
     private LocalDateTime startTime;
-    @Column(nullable = false) 
+    @Column(name = "endTime", nullable = false)
+    @NotNull(message = "End time cannot be null")
     private LocalDateTime endTime;
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp
+    @Column(name = "reservedAt", nullable = false, updatable = false)
     private LocalDateTime reservedAt;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false) //reservation status cannot be null
+    @Column(name = "reservationStatus", nullable = false) //reservation status cannot be null
     @NotNull(message = "Reservation status cannot be null")
     private ReservationStatus reservationStatus = ReservationStatus.ACTIVE; // default reservation status
 
-// getters e setters para cada um
+    //constructor
+    public Reservations(int reservationID, Users user, Spots spot, String phoneNumber, String numberPlate,
+                        LocalDateTime startTime, LocalDateTime endTime, ReservationStatus reservationStatus) {
+        this.reservationID = reservationID;
+        this.user = user;
+        this.spot = spot;
+        this.phoneNumber = phoneNumber;
+        this.numberPlate = numberPlate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.reservationStatus = reservationStatus;
+    }
 
+    //default constructor
+    public Reservations() {}
+    
     //getters and setters
     public int getReservationID() {
         return reservationID;

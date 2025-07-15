@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.smartparking.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,24 +17,25 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userID; //unique identifier for the user
-    @Column(nullable = false, unique = true) //email must be unique and cannot be null
+    @Column(name = "email", nullable = false, unique = true) //email must be unique and cannot be null
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should have a valid format")
     private String email;
-    @Column(nullable = false) //password, first and last name cannot be null
+    @Column(name = "password", nullable = false) //password, first and last name cannot be null
     @NotBlank(message = "Password cannot be blank")
     private String password;
-    @Column(nullable = false)
+    @Column(name = "firstName", nullable = false)
     @NotBlank(message = "First name cannot be blank")
-    private String firstName; 
-    @Column(nullable = false)
+    private String firstName;
+    @Column(name = "lastName", nullable = false)
     @NotBlank(message = "Last name cannot be blank")
     private String lastName;
     @NotNull(message = "User type cannot be null")
-    @Column(nullable = false) //user type cannot be null
+    @Column(name = "userType", nullable = false) //user type cannot be null
     @Enumerated(EnumType.STRING) //stores the enum as a string in the database
     private UserType userType = UserType.USER; // default user type
-    @Column(nullable = false, insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
+    @CreationTimestamp
+    @Column(name = "created", nullable = false, updatable = false)//created time cannot be null
     private LocalDateTime created; //current time stamp
 
     //constructor

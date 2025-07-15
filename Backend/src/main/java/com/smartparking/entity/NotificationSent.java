@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.smartparking.enums.NotificationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,10 +27,21 @@ public class NotificationSent {
     @ManyToOne // indicates a many-to-one relationship with the Reservations entity
     @JoinColumn(name = "reservationID", nullable = false) // reservationID cannot be null
     private Reservations reservation; // the reservation for which the notification was sent
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // specifies that the enum will be stored as a string in the database
+    @Column(name = "notificationType", nullable = false) // notificationType cannot be null
     private NotificationType notificationType; // type of notification sent
-    @Column(name = "sentAt", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp
+    @Column(name = "sentAt", updatable = false)
     private LocalDateTime sentAt; // timestamp when the notification was sent
+
+    //constructor
+    public NotificationSent(Reservations reservation, NotificationType notificationType) {
+        this.reservation = reservation;
+        this.notificationType = notificationType;
+    }
+
+    //default constructor
+    public NotificationSent() {}
 
     //getters and setters
     public int getSentNotificationID() {

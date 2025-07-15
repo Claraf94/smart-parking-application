@@ -1,6 +1,9 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import com.smartparking.enums.SpotStatus;
@@ -12,20 +15,22 @@ public class Spots {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int spotsID; //unique identifier for the parking spot
-    @Column(nullable = false, unique = true) //spot code cannot be null
+    @Column(name = "spotCode", nullable = false, unique = true) //spot code cannot be null
     @NotBlank(message = "Spot code cannot be blank")
     private String spotCode;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private SpotStatus status = SpotStatus.EMPTY; //default status
+    @Column(name = "locationDescription")
     private String locationDescription;
-    @Column(nullable = false) //coordinates cannot be null
+    @Column(name = "x", nullable = false) //coordinates cannot be null
     private int x = 0; //default x coordinate
-    @Column(nullable = false) 
+    @Column(name = "y", nullable = false) //coordinates cannot be null
     private int y = 0; //default y coordinate
-    @Column(nullable = false) //reservable status cannot be null
+    @Column(name = "isReservable", nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")//created time cannot be null
+    @CreationTimestamp
+    @Column(name = "created", nullable = false, updatable = false)//created time cannot be null
     private LocalDateTime created; //current timestamp
 
     //constructor
