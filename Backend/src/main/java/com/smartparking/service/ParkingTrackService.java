@@ -35,45 +35,50 @@ public class ParkingTrackService {
         //by using the check in and check out times
         Optional<Spots> spot = spotsRepository.findBySpotCode(spotCode);
         if(spot.isEmpty()){
-            throw new IllegalArgumentException("Wrong code provided." +spotCode);
+            throw new IllegalArgumentException("Wrong spot code: " +spotCode);
         }
         Spots spotSpot = spot.get();
         //if it is a reservable spot, only allows checkin if the user has an active reservation
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Users> userUser = usersService.findByEmail(username);
+        if(userUser.isEmpty()){
+            throw new IllegalArgumentException("User is not authenticated in the database. Check in cannot be done");
+        }
+        Users user = userUser.get();
+        //blocks multiple check ins for the same user
+        if(parkingTrackRepository.existsByUserAndConfirmCheckInTrueAndCheckOutIsNull(user)){
+            throw new IllegalArgumentException("You already checked in. You cannot do it again.");
+        }
+        //checking if the user has a reservation for that time
         if(spotSpot.getIsReservable()){
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            Optional<Users> userUser = usersService.findByEmail(username);
-            if(userUser.isEmpty()){
-                throw new IllegalArgumentException("User is not authenticade in the database. Check in cannot be done");
-            }
-            Users user = userUser.get();
-            //checking if the user has a reservation for that time
             List<Reservations> userRes = reservationsRepository.findBySpotAndUserAndReservationStatus(spotSpot, user, ReservationStatus.ACTIVE);
-            boolean userHasReservation = false;
             LocalDateTime now = LocalDateTime.now();
             for(Reservations res: userRes){
-                if (res.getStartTime() != null && res.getEndTime() != null) {
-                    if(!now.isBefore(res.getStartTime()) && now.isBefore(res.getEndTime())){
-                        userHasReservation = true;
-                        break;
-                    }
+                if (res.getStartTime() != null && res.getEndTime() != null && !now.isBefore(res.getStartTime()) && now.isBefore(res.getEndTime())){
+                    ParkingTrack reservationCheckin = new ParkingTrack();
+                    reservationCheckin.setSpot(spotSpot);
+                    reservationCheckin.setUser(user);
+                    reservationCheckin.setConfirmCheckIn(true);
+                    reservationCheckin.setCheckOut(null);
+                    reservationCheckin.setReservation(res);
+                    parkingTrackRepository.save(reservationCheckin);
+
+                    //update spot status to occupied
+                    spotSpot.setStatus(SpotStatus.OCCUPIED);
+                    spotsRepository.save(spotSpot);
+
+                    System.out.println("Check-in succesfully done for the reservation: " + res.getReservationID());
+                    return true;
                 }
             }
-            if(!userHasReservation){
-                throw new IllegalArgumentException("This spot requires a valid reservation for the check in. You are not authorized to do it.");
-            }
+            throw new IllegalArgumentException("This spot requires a valid reservation for the check in. You are not authorized to do it.");
         }
-        //if the register exists, it means that the parking spot is not available
+        //check in for non-reservable spots
         Optional<ParkingTrack> trackCheckin = parkingTrackRepository.findBySpotAndConfirmCheckInTrueAndCheckOutIsNull(spotSpot);
         if (trackCheckin.isPresent()) {
             return false;
         }
-        //if the parking spot is not checked in, it is available for check in
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Users> userUser = usersService.findByEmail(username);
-        if(userUser.isEmpty()){
-            throw new IllegalArgumentException("User is not authenticade in the database. Check in cannot be done");
-        }
-        Users user = userUser.get();
+        
         ParkingTrack newCheckin = new ParkingTrack();
         newCheckin.setSpot(spotSpot);
         newCheckin.setUser(user);
@@ -99,8 +104,6 @@ public class ParkingTrackService {
         if (trackCheckOut.isEmpty()) {
             return false;
         }
-        ParkingTrack newCheckOut = trackCheckOut.get();
-
         //retrieving the authenticated user that did the check in
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Users> userUser = usersService.findByEmail(username);
@@ -109,34 +112,43 @@ public class ParkingTrackService {
         }
 
         Users user = userUser.get();
+        //check if the user has a check in for that spot
+        Optional<ParkingTrack> userTrack = parkingTrackRepository.findByUserAndSpotAndConfirmCheckInTrueAndCheckOutIsNull(user, spotSpot);
+        if(userTrack.isEmpty()) {
+            throw new IllegalArgumentException("You do not have any check in record for this spot.");
+        }
+        
+        ParkingTrack newCheckOut = userTrack.get();
         //only the user responsible for the check in can do the check out
         if(newCheckOut.getUser().getUserID() != user.getUserID()){
             throw new IllegalArgumentException("This spot was checked in by another user. You are not allowed to do the check out.");
         }
+        newCheckOut.setConfirmCheckOut(true);
+        newCheckOut.setCheckOut(LocalDateTime.now());
+        parkingTrackRepository.save(newCheckOut);
+        
+        //update spot status to empty
+        spotSpot.setStatus(SpotStatus.EMPTY);
+        spotsRepository.save(spotSpot);
 
         //checking out from reservable spots
         if(spotSpot.getIsReservable()){
             Optional<Reservations> res = reservationsRepository.findFirstBySpotAndUserAndReservationStatusOrderByStartTimeDesc(spotSpot, user, ReservationStatus.ACTIVE);
-            if(res.isEmpty()){
-                throw new IllegalArgumentException("You do not have any active reservation for this spot.");
+            if(res.isPresent()){
+                Reservations reservation = res.get();
+                //apply fine if left the place after the reservation ends
+                if(LocalDateTime.now().isAfter(reservation.getEndTime())){
+                    notificationsService.createFineNotification(user);
+                    System.out.println("Fine applied due to leaving the spot after the reservation end time.");
+                }
+                //updates status from a reservation spot
+                reservation.setReservationStatus(ReservationStatus.FINISHED);
+                reservationsRepository.save(reservation);
+                System.out.println("Check out successfully done for the reservation: " + reservation.getReservationID());
+            }else{
+                throw new IllegalArgumentException("No active reservation was found for this spot.");
             }
-            Reservations reservation = res.get();
-            //apply fine if left the place after the reservation ends
-            if(LocalDateTime.now().isAfter(reservation.getEndTime())){
-                notificationsService.createFineNotification(user);
-            }
-            //updates status from a reservation spot
-            reservation.setReservationStatus(ReservationStatus.FINISHED);
-            reservationsRepository.save(reservation);
         }
-
-        //if the parking spot is checked in, it can be released
-        newCheckOut.setConfirmCheckOut(true);
-        parkingTrackRepository.save(newCheckOut);
-
-        //update spot status to empty
-        spotSpot.setStatus(SpotStatus.EMPTY);
-        spotsRepository.save(spotSpot);
         return true;
     }
 

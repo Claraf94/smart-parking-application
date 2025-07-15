@@ -31,4 +31,6 @@ public interface ReservationsRepository extends JpaRepository<Reservations, Inte
     List<Reservations> findByReservationStatusAndEndTimeBetween(ReservationStatus reservationStatus, LocalDateTime startTime, LocalDateTime endTime);
     //check the user which the reservation expired
     List<Reservations> findByReservationStatusAndEndTimeBefore(ReservationStatus reservationStatus, LocalDateTime time);
+    //check the user which the reservation is cancelled because of a no-show
+    List<Reservations> findByReservationStatusAndStartTimeBefore(ReservationStatus reservationStatus, LocalDateTime time);
 }//reservations repository class

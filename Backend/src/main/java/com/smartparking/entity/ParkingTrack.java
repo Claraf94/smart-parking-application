@@ -23,9 +23,9 @@ public class ParkingTrack {
     //instead of using userID, it is better to use the reference object to the Spots entity
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot; 
-    @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", nullable = true)
+    @Column(name = "checkIn", nullable = true)
     private LocalDateTime checkIn;//check in and check out time cannot be null
-    @Column(name = "checkOut", insertable = false,updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", nullable = true)
+    @Column(name = "checkOut", nullable = true) //check out time can be null
     private LocalDateTime checkOut;
     @Column(nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status
@@ -71,6 +71,9 @@ public class ParkingTrack {
     
     public LocalDateTime getCheckIn() {
         return checkIn;
+    }
+    public void setCheckIn(LocalDateTime checkIn) {
+        this.checkIn = checkIn;
     }
 
     public LocalDateTime getCheckOut() {

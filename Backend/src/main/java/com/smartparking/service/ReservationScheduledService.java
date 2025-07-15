@@ -11,6 +11,7 @@ import com.smartparking.entity.Reservations;
 import com.smartparking.enums.NotificationType;
 import com.smartparking.enums.ReservationStatus;
 import com.smartparking.repository.NotificationSentRepository;
+import com.smartparking.repository.ParkingTrackRepository;
 import com.smartparking.repository.ReservationsRepository;
 
 @Component
@@ -19,6 +20,8 @@ public class ReservationScheduledService {
     private NotificationsService notificationsService;
     @Autowired
     private ReservationsRepository reservationsRepository;
+    @Autowired
+    private ParkingTrackRepository parkingTrackRepository;
     @Autowired
     private NotificationSentRepository notificationSentRepository;
     @Scheduled(cron = "0 * * * * ?") // Every minute
@@ -45,6 +48,22 @@ public class ReservationScheduledService {
                 Notifications notification = notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_EXPIRED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.", res);
                 if(notification != null) {
                     System.out.println("Notification sent for expired reservation: " + res.getReservationID());
+                }
+            }
+        }
+
+        //notify users about a reservation that has been cancelled because of a no-show within 15 minutes
+        List<Reservations> cancelled = reservationsRepository.findByReservationStatusAndStartTimeBefore(ReservationStatus.ACTIVE, now.minusMinutes(15));
+        for (Reservations res : cancelled) {
+            if(!parkingTrackRepository.existsByReservationAndConfirmCheckInTrue(res)){
+                //the reservation is cancelled and the time is available for another reservation and notifies the user
+                res.setReservationStatus(ReservationStatus.CANCELLED);
+                reservationsRepository.save(res);
+                if(!notificationSentRepository.existsByReservationAndNotificationType(res, NotificationType.RESERVATION_CANCELLED)) {
+                    Notifications notification = notificationsService.createNotificationForUser(res.getUser(), NotificationType.RESERVATION_CANCELLED, "Your reservation for spot " + res.getSpot().getSpotsID() + " has been cancelled due to no-show within the time.", res);
+                    if(notification != null) {
+                        System.out.println("Notification sent to inform user about cancellation: " + res.getReservationID());
+                    }
                 }
             }
         }

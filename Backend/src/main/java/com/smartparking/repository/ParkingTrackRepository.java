@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.smartparking.entity.ParkingTrack;
+import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
 
@@ -24,4 +25,10 @@ public interface ParkingTrackRepository extends JpaRepository<ParkingTrack, Inte
     Optional<ParkingTrack> findBySpotAndConfirmCheckInFalseAndCheckOutIsNull(Spots spot);
     //checking active check in (spot checked in but not checked out yet)
     Optional<ParkingTrack> findBySpotAndConfirmCheckInTrueAndCheckOutIsNull(Spots spot);
+    //checking if a reservation had a check in done
+    boolean existsByReservationAndConfirmCheckInTrue(Reservations reservation);
+    //checking if a spot has been checked in not to allow double check ins
+    boolean existsByUserAndConfirmCheckInTrueAndCheckOutIsNull(Users user);
+    //checking if a spot has been checked out not to allow double check outs
+    Optional<ParkingTrack> findByUserAndSpotAndConfirmCheckInTrueAndCheckOutIsNull(Users user, Spots spot);
 }//parking track repository class
