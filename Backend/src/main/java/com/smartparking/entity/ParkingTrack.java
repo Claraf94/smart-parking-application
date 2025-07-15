@@ -23,14 +23,17 @@ public class ParkingTrack {
     //instead of using userID, it is better to use the reference object to the Spots entity
     //allowing for better encapsulation and better management of relationships in the database
     private Spots spot; 
-    @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "checkIn", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", nullable = true)
     private LocalDateTime checkIn;//check in and check out time cannot be null
-    @Column(name = "checkOut", insertable = false,updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "checkOut", insertable = false,updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", nullable = true)
     private LocalDateTime checkOut;
     @Column(nullable = false) //confirm check in and confirm check out cannot be null
     private boolean confirmCheckIn = false; // default confirm check in status
     @Column(nullable = false) 
     private boolean confirmCheckOut = false; // default confirm check out status
+    @ManyToOne
+    @JoinColumn(name = "reservationID", nullable = true)
+    private Reservations reservation; //optional relationship with Reservations entity
 
     //constructor
     public ParkingTrack(Users user, Spots spot) {
@@ -94,6 +97,14 @@ public class ParkingTrack {
         this.confirmCheckOut = confirmCheckOut;
     }
 
+    public Reservations getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservations reservation) {
+        this.reservation = reservation;
+    }
+
    @Override
     public String toString() {
         return "Parking Track ID: " + parkingID +
@@ -102,6 +113,7 @@ public class ParkingTrack {
             ", Check In: " + checkIn +
             ", Check Out: " + checkOut +
             ", Confirm Check In: " + confirmCheckIn +
-            ", Confirm Check Out: " + confirmCheckOut;
+            ", Confirm Check Out: " + confirmCheckOut +
+            ", Reservation ID: " + (reservation != null ? reservation.getReservationID() : "No reservation associated.");
     }
 }//parking track class
