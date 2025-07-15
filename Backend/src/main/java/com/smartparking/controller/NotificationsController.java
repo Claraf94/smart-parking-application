@@ -2,7 +2,6 @@ package com.smartparking.controller;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Users;
 import com.smartparking.service.NotificationsService;
-import com.smartparking.service.SetEmailService;
 import com.smartparking.service.UsersService;
 
 
@@ -33,8 +31,6 @@ public class NotificationsController {
     private NotificationsService notificationsService;
     @Autowired
     private UsersService usersService;
-    @Autowired
-    private SetEmailService setEmailService;
 
     //creating a notification
     @PostMapping("/create")

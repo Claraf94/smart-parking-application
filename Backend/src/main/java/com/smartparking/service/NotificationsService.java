@@ -64,6 +64,9 @@ public class NotificationsService{
             if (user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
                 throw new IllegalArgumentException("User does not exist on the database.");
             }
+            if (notificationsRepository.existsByUserAndNotificationTypeAndTextMessage(user, type, message)) {
+                return null;
+            }
         }
 
         Notifications notification = new Notifications();
@@ -74,9 +77,7 @@ public class NotificationsService{
         notification.setIsPaid(false);
         Notifications savedNotification = notificationsRepository.save(notification);
         
-        if(shouldSendNotification(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
-            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
-        }
+        sendEmailIfNeeded(user, type, "Parking Notification", message);
         return savedNotification;
     }
 
@@ -86,17 +87,18 @@ public class NotificationsService{
         if(user == null || user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
             throw new IllegalArgumentException("User does not exist.");
         }
-
+        final String messageFineApplied = "A fine of € " + DEFAULT_FINE_AMOUNT + " has been applied to your account due to problems following the parking rules.";
+        if(notificationsRepository.existsByUserAndNotificationTypeAndTextMessage(user, NotificationType.FINE_APPLIED, messageFineApplied)) {
+            return null; //notification already exists
+        }
         Notifications notification = new Notifications();
         notification.setUser(user);
         notification.setNotificationType(NotificationType.FINE_APPLIED);
-        notification.setTextMessage("A fine of € "+ DEFAULT_FINE_AMOUNT + " has been applied to your account due to problems following the parking rules.");
+        notification.setTextMessage(messageFineApplied);
         notification.setFine(DEFAULT_FINE_AMOUNT);
         notification.setIsPaid(false);
         //send email notification
-        if(user.getEmail() != null && !user.getEmail().isBlank()) {
-            setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification - Fine Applied", notification.getTextMessage());
-        }
+        sendEmailIfNeeded(user, NotificationType.FINE_APPLIED, "Parking Fine Notification - Fine Applied", notification.getTextMessage());
         return notificationsRepository.save(notification);
     }
 
@@ -114,29 +116,30 @@ public class NotificationsService{
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
+        if (notificationsRepository.existsByUserAndNotificationTypeAndTextMessage(user, type, message)) {
+            return null;
+        }
         if(reservation != null && notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
-                return null; // Notification already sent for this reservation and type
-            }
-            Notifications notification = new Notifications();
-            notification.setUser(user);
-            notification.setNotificationType(type);
-            notification.setTextMessage(message);
-            notification.setFine(BigDecimal.ZERO);
-            notification.setIsPaid(false);
-            Notifications savedNotification = notificationsRepository.save(notification);
+            return null; 
+        }
+        Notifications notification = new Notifications();
+        notification.setUser(user);
+        notification.setNotificationType(type);
+        notification.setTextMessage(message);
+        notification.setFine(BigDecimal.ZERO);
+        notification.setIsPaid(false);
+        Notifications savedNotification = notificationsRepository.save(notification);
            
-            if(shouldSendNotification(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
-                setEmailService.sendEmailConfig(user.getEmail(), "Parking Notification", message);
-            }
+        sendEmailIfNeeded(user, type, "Parking Notification", message);
 
-            if(reservation != null) {
-                //save the notification as sent
-                NotificationSent notificationSent = new NotificationSent();
-                notificationSent.setReservation(reservation);
-                notificationSent.setNotificationType(type);
-                notificationSentRepository.save(notificationSent);
-            }
-            return savedNotification;
+        if(reservation != null) {
+            //save the notification as sent
+            NotificationSent notificationSent = new NotificationSent();
+            notificationSent.setReservation(reservation);
+            notificationSent.setNotificationType(type);
+            notificationSentRepository.save(notificationSent);
+        }
+        return savedNotification;
     }
 
     //mark a fine as paid
@@ -170,7 +173,7 @@ public class NotificationsService{
         List<Users> everyUser = usersRepository.findAll();
         for (Users user : everyUser) {
             if(user.getEmail() != null && !user.getEmail().isBlank()) {
-                //setEmailService.sendEmailConfig(user.getEmail(), subject, message);
+                setEmailService.sendEmailConfig(user.getEmail(), subject, message);
             }
         }
     }
@@ -180,7 +183,7 @@ public class NotificationsService{
         return reservationsRepository.findById(reservationID);
     }
 
-    public boolean shouldSendNotification(NotificationType type) {
+    public boolean sendNotificationEmail(NotificationType type) {
         // Define the logic to determine if a notification should be sent based on its type
         return type == NotificationType.FINE_APPLIED ||
                type == NotificationType.SPOT_RESERVED ||
@@ -189,5 +192,12 @@ public class NotificationsService{
                type == NotificationType.RESERVATION_CANCELLED ||
                type == NotificationType.RESERVATION_NOT_POSSIBLE ||
                type == NotificationType.UNAUTHORIZED_CHECKIN;
+    }
+
+    //send email if needed based on the notification type and user
+    private void sendEmailIfNeeded(Users user, NotificationType type, String subject, String message) {
+        if (sendNotificationEmail(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+            setEmailService.sendEmailConfig(user.getEmail(), subject, message);
+        }
     }
 }//notifications service class
