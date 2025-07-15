@@ -116,9 +116,6 @@ public class NotificationsService{
         if(type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
-        if (notificationsRepository.existsByUserAndNotificationTypeAndTextMessage(user, type, message)) {
-            return null;
-        }
         if(reservation != null && notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
             return null; 
         }

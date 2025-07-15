@@ -46,7 +46,8 @@ public class ParkingTrackService {
         }
         Users user = userUser.get();
         //blocks multiple check ins for the same user
-        if(parkingTrackRepository.existsByUserAndConfirmCheckInTrueAndCheckOutIsNull(user)){
+        Optional<ParkingTrack> existingTrack = parkingTrackRepository.findByUserAndSpotAndConfirmCheckInTrueAndCheckOutIsNull(user, spotSpot);
+        if(existingTrack.isPresent()){
             throw new IllegalArgumentException("You already checked in. You cannot do it again.");
         }
         //checking if the user has a reservation for that time
@@ -120,6 +121,9 @@ public class ParkingTrackService {
         
         ParkingTrack newCheckOut = userTrack.get();
         //only the user responsible for the check in can do the check out
+        if(newCheckOut.isConfirmCheckOut()) {
+            throw new IllegalArgumentException("You already checked out from this spot.");
+        }
         if(newCheckOut.getUser().getUserID() != user.getUserID()){
             throw new IllegalArgumentException("This spot was checked in by another user. You are not allowed to do the check out.");
         }

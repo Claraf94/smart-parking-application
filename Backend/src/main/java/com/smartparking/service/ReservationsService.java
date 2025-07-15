@@ -77,7 +77,7 @@ public class ReservationsService {
         Reservations saveReservation = reservationsRepository.save(reservation);
         Users user = saveReservation.getUser();
         if(user != null){
-            notificationsService.createNotificationForUser(user, NotificationType.SPOT_RESERVED, "Reservation successfully created.");
+            notificationsService.createNotificationForUser(user, NotificationType.SPOT_RESERVED, "Reservation successfully created.", saveReservation);
         }
         return saveReservation;
     }   
