@@ -1,6 +1,7 @@
 package com.smartparking.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import com.smartparking.repository.ParkingTrackRepository;
 import com.smartparking.repository.ReservationsRepository;
 import com.smartparking.repository.SpotsRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service //This class is a parking track service component
 public class ParkingTrackService {
     @Autowired
@@ -29,6 +32,7 @@ public class ParkingTrackService {
     @Autowired
     private ReservationsRepository reservationsRepository;
     
+    @Transactional
     public boolean checkInSpot (String spotCode) {
         //Check if the parking spot is available
         //it will be considered available if there is no parking track associated 
@@ -51,7 +55,7 @@ public class ParkingTrackService {
             throw new IllegalArgumentException("You already checked in. You cannot do it again.");
         }
         //checking if the user has a reservation for that time
-        if(spotSpot.getIsReservable()){
+        if(Boolean.TRUE.equals(spotSpot.getIsReservable())){
             List<Reservations> userRes = reservationsRepository.findBySpotAndUserAndReservationStatus(spotSpot, user, ReservationStatus.ACTIVE);
             LocalDateTime now = LocalDateTime.now();
             for(Reservations res: userRes){
@@ -60,6 +64,7 @@ public class ParkingTrackService {
                     reservationCheckin.setSpot(spotSpot);
                     reservationCheckin.setUser(user);
                     reservationCheckin.setConfirmCheckIn(true);
+                    reservationCheckin.setCheckIn(LocalDateTime.now());
                     reservationCheckin.setCheckOut(null);
                     reservationCheckin.setReservation(res);
                     parkingTrackRepository.save(reservationCheckin);
@@ -84,6 +89,7 @@ public class ParkingTrackService {
         newCheckin.setSpot(spotSpot);
         newCheckin.setUser(user);
         newCheckin.setConfirmCheckIn(true);
+        newCheckin.setCheckIn(LocalDateTime.now());
         newCheckin.setCheckOut(null);
         parkingTrackRepository.save(newCheckin);
 
@@ -93,6 +99,7 @@ public class ParkingTrackService {
         return true;
     }
 
+    @Transactional
     public boolean checkOutSpot(String spotCode) {
         Optional<Spots> spot = spotsRepository.findBySpotCode(spotCode);
         if (spot.isEmpty()) {
@@ -136,7 +143,7 @@ public class ParkingTrackService {
         spotsRepository.save(spotSpot);
 
         //checking out from reservable spots
-        if(spotSpot.getIsReservable()){
+        if(Boolean.TRUE.equals(spotSpot.getIsReservable())){
             Optional<Reservations> res = reservationsRepository.findFirstBySpotAndUserAndReservationStatusOrderByStartTimeDesc(spotSpot, user, ReservationStatus.ACTIVE);
             if(res.isPresent()){
                 Reservations reservation = res.get();
@@ -178,7 +185,17 @@ public class ParkingTrackService {
 
     public List<ParkingTrack> getPendingCheckIns() {
         //find by spots that a reservation was made but has no check-in register yet
-        return parkingTrackRepository.findByConfirmCheckInFalse();
+        List<ParkingTrack> pendingCheckIns = parkingTrackRepository.findByConfirmCheckInFalse();
+        List<ParkingTrack> pending = new ArrayList<>();
+        LocalDateTime current = LocalDateTime.now();
+        for(ParkingTrack track : pendingCheckIns) {
+            Reservations res = track.getReservation();
+            if(res != null && res.getReservationStatus() == ReservationStatus.ACTIVE && res.getStartTime() != null && current.isAfter(res.getStartTime()) && current.isBefore(res.getStartTime().plusMinutes(15))){
+                //if the reservation is active and still within the allowed time frame for check in
+                pending.add(track);
+            }
+        }
+        return pending;
     }
 
     public Spots findSpotBySpotCode(String spotCode){

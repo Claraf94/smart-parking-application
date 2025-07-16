@@ -33,6 +33,7 @@ public class NotificationsController {
     private UsersService usersService;
 
     //creating a notification
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<Notifications> createNotification(@RequestBody Notifications notification) {
         try{
@@ -52,6 +53,7 @@ public class NotificationsController {
     }
 
     //creating a notification associated with a reservation
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create/reservation-notification")
     public ResponseEntity<Notifications> createNotificationForReservation(@RequestBody Notifications notification) {
         try{

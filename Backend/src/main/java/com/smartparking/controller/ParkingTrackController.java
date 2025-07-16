@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +43,7 @@ public class ParkingTrackController {
     }
 
     //returns every activity made by a specific user by its ID
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/{userId}")
     public List<ParkingTrack> getByUser(@PathVariable int userId){
         if(userId <=0){
@@ -53,6 +55,7 @@ public class ParkingTrackController {
     }
     
     //returns parking activity for a specific spot by its ID
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/spots/{spotCode}")
     public List<ParkingTrack> getBySpot(@PathVariable String spotCode){
         Spots spot = parkingTrackService.findSpotBySpotCode(spotCode);
@@ -60,24 +63,28 @@ public class ParkingTrackController {
     }
 
     //returns occupied spots, where the check-in was made but not the check-out
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/checked-in")
     public List<ParkingTrack> getCheckedIn(){
         return parkingTrackService.getCheckedIn();
     }
 
     //returns the spots that are currently free, where both check-in and check-out was made
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/checked-out")
     public List<ParkingTrack> getCheckedOut(){
         return parkingTrackService.getCheckedOut();
     }
 
     //returns reservations where the driver has not checked-in yet
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pending-checkin")
     public List<ParkingTrack> getPendingCheckIns(){
         return parkingTrackService.getPendingCheckIns();
     }
     
     //returns all parking track register
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public List<ParkingTrack> trackAllSpots(){
         return parkingTrackService.getAll();

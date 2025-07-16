@@ -43,6 +43,7 @@ public class UsersController {
     }
 
     //returns a user by its email
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findByEmail/{email}")
     public Optional<Users> findByEmail(@PathVariable String email) {
         return usersService.findByEmail(email);
@@ -55,6 +56,7 @@ public class UsersController {
     }
     
     //returns users by its type
+    @PreAuthorize("hasRole('ADMIN')") //only admin can access this endpoint
     @GetMapping("/findByUserType/{userType}")
     public ResponseEntity<List<Users>> findByUserType(@PathVariable String userType) {
         try{

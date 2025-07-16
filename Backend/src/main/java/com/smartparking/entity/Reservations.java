@@ -40,7 +40,6 @@ public class Reservations {
     @NotNull(message = "Start time cannot be null")
     private LocalDateTime startTime;
     @Column(name = "endTime", nullable = false)
-    @NotNull(message = "End time cannot be null")
     private LocalDateTime endTime;
     @CreationTimestamp
     @Column(name = "reservedAt", nullable = false, updatable = false)

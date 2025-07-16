@@ -5,22 +5,31 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.smartparking.entity.ParkingTrack;
 import com.smartparking.entity.Reservations;
 import com.smartparking.entity.Spots;
 import com.smartparking.entity.Users;
 import com.smartparking.enums.NotificationType;
 import com.smartparking.enums.ReservationStatus;
+import com.smartparking.repository.ParkingTrackRepository;
 import com.smartparking.repository.ReservationsRepository;
 
 
 @Service //this class is a reservation service component
 public class ReservationsService {
+
+    private final ParkingTrackRepository parkingTrackRepository;
     @Autowired
     private ReservationsRepository reservationsRepository;
     @Autowired
     private SpotsService spotsService;
     @Autowired
     private NotificationsService notificationsService;
+
+    ReservationsService(ParkingTrackRepository parkingTrackRepository) {
+        this.parkingTrackRepository = parkingTrackRepository;
+    }
 
     //verify if a reservation exists before creating it by using the Spots entity reference and the start and end times
     public Reservations createReservation(Reservations reservation) {
@@ -75,6 +84,17 @@ public class ReservationsService {
         reservation.setSpot(existingSpot.get());
         reservation.setReservationStatus(ReservationStatus.ACTIVE);
         Reservations saveReservation = reservationsRepository.save(reservation);
+
+        ParkingTrack pendingCheckIn = new ParkingTrack();
+        pendingCheckIn.setSpot(saveReservation.getSpot());
+        pendingCheckIn.setUser(saveReservation.getUser());
+        pendingCheckIn.setReservation(saveReservation);
+        pendingCheckIn.setConfirmCheckIn(false);
+        pendingCheckIn.setCheckIn(null);
+        pendingCheckIn.setCheckOut(null);
+        //save the pending check-in for the reservation
+        parkingTrackRepository.save(pendingCheckIn);
+
         Users user = saveReservation.getUser();
         if(user != null){
             notificationsService.createNotificationForUser(user, NotificationType.SPOT_RESERVED, "Reservation successfully created.", saveReservation);
