@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import com.smartparking.entity.Notifications;
 import com.smartparking.entity.Reservations;
 import com.smartparking.enums.NotificationType;
