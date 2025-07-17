@@ -11030,3 +11030,40 @@ header.masthead h1, header.masthead .h1 {
 #portfolio .container-fluid .portfolio-box:hover .portfolio-box-caption, #portfolio .container-sm .portfolio-box:hover .portfolio-box-caption, #portfolio .container-md .portfolio-box:hover .portfolio-box-caption, #portfolio .container-lg .portfolio-box:hover .portfolio-box-caption, #portfolio .container-xl .portfolio-box:hover .portfolio-box-caption, #portfolio .container-xxl .portfolio-box:hover .portfolio-box-caption {
   opacity: 1;
 }
+/* ======== Estilos só para parking-spots.html ======== */
+body.parking-page {
+  /* garante que este body ocupe a viewport */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: relative; /* para posicionar o map absoluto */
+}
+
+/* Navbar desta página */
+body.parking-page nav#mainNav {
+  position: fixed;
+  top:    0;
+  left:   0;
+  right:  0;
+  height: 80px;     /* ajuste à sua navbar */
+  z-index: 1000;
+}
+
+/* Footer desta página */
+body.parking-page footer {
+  position: fixed;
+  bottom: 0;
+  left:   0;
+  right:  0;
+  height: 80px;     /* ajuste ao seu footer */
+  z-index: 1000;
+}
+
+/* Container do mapa: só o espaço entre nav e footer */
+body.parking-page #map {
+  position: absolute;
+  top:    80px;     /* mesma altura da navbar */
+  bottom: 80px;     /* mesma altura do footer */
+  left:   0;
+  right:  0;
+}
