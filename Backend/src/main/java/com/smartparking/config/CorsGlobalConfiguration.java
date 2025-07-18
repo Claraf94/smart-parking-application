@@ -14,7 +14,7 @@ public class CorsGlobalConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5501")); // ou "*"
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5501")); // ou  //aqui vem o codigo da azure, lembrar depois"*"
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
