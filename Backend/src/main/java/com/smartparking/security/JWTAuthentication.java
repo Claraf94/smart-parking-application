@@ -40,6 +40,7 @@ public class JWTAuthentication{
                 .getSubject();
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getRolesFromToken(String token) {
         //logic to extract roles from the JWT token
         List<String> roles = Jwts.parserBuilder()

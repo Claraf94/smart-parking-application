@@ -24,9 +24,9 @@ public class Spots {
     @Column(name = "locationDescription")
     private String locationDescription;
     @Column(name = "x", nullable = false) //coordinates cannot be null
-    private int x = 0; //default x coordinate
+    private Double x = 0.00; //default x coordinate
     @Column(name = "y", nullable = false) //coordinates cannot be null
-    private int y = 0; //default y coordinate
+    private Double y = 0.00; //default y coordinate
     @Column(name = "isReservable", nullable = false) //reservable status cannot be null
     private Boolean isReservable = true;
     @CreationTimestamp
@@ -34,7 +34,7 @@ public class Spots {
     private LocalDateTime created; //current timestamp
 
     //constructor
-    public Spots(String spotCode, String locationDescription, int x, int y, Boolean isReservable) {
+    public Spots(String spotCode, String locationDescription, Double x, Double y, Boolean isReservable) {
         this.spotCode = spotCode;
         this.locationDescription = locationDescription;
         this.x = x;
@@ -78,19 +78,19 @@ public class Spots {
         this.locationDescription = locationDescription;
     }
 
-    public int getX() {
+    public Double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(Double x) {
         this.x = x;
     }
 
-    public int getY() {
+    public Double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(Double y) {
         this.y = y;
     }
 
