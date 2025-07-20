@@ -6,8 +6,7 @@ public class ReservationNotification {
     //declare variables
     private String message;
     private NotificationType type;
-    private int userID;
-    private int reservationID;
+    private int userID, reservationID;
 
     //constructor
     public ReservationNotification(String message, NotificationType type, int userID, int reservationID) {

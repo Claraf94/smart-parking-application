@@ -2,8 +2,7 @@ package com.smartparking.dto;
 
 public class CoordinatesRequest {
     //declare variables
-    private Double x;
-    private Double y;
+    private Double x, y;
 
     //constructor
     public CoordinatesRequest(Double x, Double y) {

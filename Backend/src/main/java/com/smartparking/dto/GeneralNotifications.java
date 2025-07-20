@@ -3,8 +3,7 @@ package com.smartparking.dto;
 
 public class GeneralNotifications {
     //declare variables
-    private String message;
-    private String subject;
+    private String message, subject;
     
     // Constructor
     public GeneralNotifications(String message, String subject) {

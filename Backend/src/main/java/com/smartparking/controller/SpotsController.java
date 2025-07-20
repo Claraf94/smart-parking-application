@@ -1,5 +1,6 @@
 package com.smartparking.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartparking.dto.CoordinatesRequest;
+import com.smartparking.dto.SpotsDTO;
 import com.smartparking.entity.Spots;
 import com.smartparking.enums.SpotStatus;
 import com.smartparking.repository.SpotsRepository;
@@ -44,20 +46,22 @@ public class SpotsController {
     // returns all parking spots and can be filtered by its query parameter such as
     // status
     @GetMapping("")
-    public List<Spots> findSpots(
-            @RequestParam(required = false) SpotStatus status,
-            @RequestParam(required = false) Boolean isReservable) {
+    public List<SpotsDTO> findSpots(@RequestParam(required = false) SpotStatus status, @RequestParam(required = false) Boolean isReservable) {
+        List<Spots> spots;
         if (status != null && isReservable != null) {
-            return spotsService.findByStatusAndIsReservable(status, isReservable); // filter by both status and
-                                                                                   // reservable
+            spots = spotsService.findByStatusAndIsReservable(status, isReservable); // filter by both status and reservable
+        } else if (status != null) {
+            spots = spotsService.findByStatus(status); // filter by status
+        } else if (isReservable != null && isReservable) {
+            spots = spotsService.findByIsReservableTrue(); // filter by reservable spots
+        } else {
+            spots = spotsService.findAll(); // returns all spots without any filter applied
         }
-        if (status != null) {
-            return spotsService.findByStatus(status); // filter by status
+        List<SpotsDTO> spotsDTOs = new ArrayList<>();
+        for (Spots spot : spots) {
+            spotsDTOs.add(spotsService.convertDTO(spot)); // convert each spot to DTO
         }
-        if (isReservable != null && isReservable) {
-            return spotsService.findByIsReservableTrue(); // filter by reservable spots
-        }
-        return spotsService.findAll();// returns all spots without any filter applied
+        return spotsDTOs;
     }
 
     // returns a parking spot by its code
@@ -81,6 +85,17 @@ public class SpotsController {
         spotsRepository.save(spot);
         return ResponseEntity.ok("Coordinates updated successfully");
 
+    }
+
+    //get the closest parking spot by coordinates
+    @GetMapping("/closestSpot")
+    public ResponseEntity<Spots> getClosestSpot(@RequestParam double x, @RequestParam double y) {
+        Spots closestSpot = spotsService.findClosestSpot(x, y);
+        if (closestSpot != null) {
+            return ResponseEntity.ok(closestSpot);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     // update a parking spot
