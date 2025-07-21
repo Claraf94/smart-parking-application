@@ -26,7 +26,8 @@ import com.smartparking.service.UsersService;
 
 @RestController
 @RequestMapping("/users")
-//this controller handles all operations related to users, including registration, retrieval by email, and checking if an email exists.
+// this controller handles all operations related to users, including
+// registration, retrieval by email, and checking if an email exists.
 public class UsersController {
     @Autowired
     private UsersService usersService;
@@ -35,40 +36,40 @@ public class UsersController {
     @Autowired
     private JWTAuthentication jwtAuthentication;
 
-    //register a new user
+    // register a new user
     @PostMapping("/register")
     public Users registerNewUser(@RequestBody Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); //encode the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // encode the password before saving
         return usersService.registerNewUser(user);
     }
 
-    //returns a user by its email
+    // returns a user by its email
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findByEmail/{email}")
     public Optional<Users> findByEmail(@PathVariable String email) {
         return usersService.findByEmail(email);
     }
 
-    //checks if an email has already been registered
+    // checks if an email has already been registered
     @GetMapping("/emailExists/{email}")
     public boolean emailExists(@PathVariable String email) {
         return usersService.emailExists(email);
     }
-    
-    //returns users by its type
-    @PreAuthorize("hasRole('ADMIN')") //only admin can access this endpoint
+
+    // returns users by its type
+    @PreAuthorize("hasRole('ADMIN')") // only admin can access this endpoint
     @GetMapping("/findByUserType/{userType}")
     public ResponseEntity<List<Users>> findByUserType(@PathVariable String userType) {
-        try{
+        try {
             UserType userT = UserType.valueOf(userType.toUpperCase());
             return ResponseEntity.ok(usersService.findByUserType(userT));
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
     }
 
-    //returns all users (admin tool)
-    @PreAuthorize("hasRole('ADMIN')") //only admin can access this endpoint
+    // returns all users (admin tool)
+    @PreAuthorize("hasRole('ADMIN')") // only admin can access this endpoint
     @GetMapping("/findAll")
     public List<Users> findAll() {
         return usersService.findAll();
@@ -76,18 +77,19 @@ public class UsersController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Users loginRequest) {
-        //logic to authenticate user and generate JWT token
+        // logic to authenticate user and generate JWT token
         Optional<Users> existentUser = usersService.findByEmail(loginRequest.getEmail());
-        if (existentUser.isPresent()){
-            Users user = existentUser.get();
-            if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
-                String role = user.getUserType() == UserType.ADMIN ? "ROLE_ADMIN": "ROLE_USER";
-                List<String> roles = List.of(role);
-                //separating message and token for clarity when tracking login attempts
-                return ResponseEntity.ok(Map.of("message", "Login successful, token for authentication: " + jwtAuthentication.generateSecurityToken(user.getEmail(), roles)));
-            }
+        if (existentUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Email not found"));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Invalid email or password"));
+        Users user = existentUser.get();
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("Error", "Incorrect password"));
+        }
+        String role = user.getUserType() == UserType.ADMIN ? "ROLE_ADMIN" : "ROLE_USER";
+        List<String> roles = List.of(role);
+        String token = jwtAuthentication.generateSecurityToken(user.getEmail(), roles);
+        return ResponseEntity.ok(Map.of("message", "Login successful.", "token", token));
     }
 
     @PostMapping("/logout")
@@ -95,39 +97,40 @@ public class UsersController {
         return ResponseEntity.ok().build();
     }
 
-    //request to set a new password without being loggedin
+    // request to set a new password without being loggedin
     @PostMapping("/resetTokenPassword")
-    public ResponseEntity<String> requestResetPassword(@RequestBody PasswordResetRequest request){
-        boolean resetOperation = usersService.resetPasswordWithToken(request.getTokenPassword(), request.getNewPassword());
-        if(resetOperation){
+    public ResponseEntity<String> requestResetPassword(@RequestBody PasswordResetRequest request) {
+        boolean resetOperation = usersService.resetPasswordWithToken(request.getTokenPassword(),
+                request.getNewPassword());
+        if (resetOperation) {
             return ResponseEntity.ok("Password was reset successfully.");
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token for the operation.");
         }
     }
 
-    //request to set a new password being loggedin
+    // request to set a new password being loggedin
     @PostMapping("/updatePassword")
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateRequest request){
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || !authentication.isAuthenticated()){
+        if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated.");
         }
         String email = authentication.getName();
-        if(email == null || email.isBlank()){
+        if (email == null || email.isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email.");
         }
-        
-        if(usersService.findByEmail(email).isEmpty()){
+
+        if (usersService.findByEmail(email).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
         Users user = usersService.findByEmail(email).get();
-        if(passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
+        if (passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             usersService.save(user);
             return ResponseEntity.ok("Password was updated successfully.");
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password does not match the current one.");
-        }   
+        }
     }
-}//users controller class
+}// users controller class

@@ -35,25 +35,29 @@
         </div>
     </nav>
 
-    <!-- Login section -->
-    <main class="main-login d-flex align-items-center justify-content-center">
-        <div class="login-box shadow p-4 rounded-4">
-            <h2 class="text-center mb-4">Login</h2>
-            <form id="loginForm">
+    <!-- Register form -->
+    <main class="main-register d-flex align-items-center justify-content-center">
+        <div class="register-box shadow p-4 rounded-4">
+            <h2 class="text-center mb-4">Register</h2>
+            <form id="registerForm">
                 <div class="login-form mb-3">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="email" class="form-control rounded-4" id="email" placeholder="Enter your email:"required />
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" class="rounded-4" required />
                 </div>
                 <div class="login-form mb-3">
-                    <label for="password" class="form-label">Password:</label>
-                    <input type="password" class="form-control rounded-4" id="password" placeholder="Enter your password:" required />
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" class="rounded-4" required />
                 </div>
-                <button type="submit" class="btn btn-primary w-100 rounded-4">Login</button>
+                <div class="login-form mb-3">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" class="rounded-4" required />
+                </div>
+                <div class="login-form mb-3">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" class="rounded-4" required />
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-4">Register</button>
             </form>
-            <div class="login-links mt-3 text-center">
-                <a href="forgot-password.html">Forgot password?</a><br />
-                <a href="register.html">Create an account</a>
-            </div>
         </div>
     </main>
     <!-- Footer -->
