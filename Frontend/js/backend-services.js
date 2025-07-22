@@ -1,4 +1,4 @@
-const API_BASE_URL = smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net;
+const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
 //const API_BASE_URL = "http://localhost:8080";
 
 //function to add headers to the request
