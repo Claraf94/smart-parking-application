@@ -38,9 +38,18 @@ public class UsersController {
 
     // register a new user
     @PostMapping("/register")
-    public Users registerNewUser(@RequestBody Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // encode the password before saving
-        return usersService.registerNewUser(user);
+    public ResponseEntity<Map<String, Object>> registerNewUser(@RequestBody Users user) {
+        if (usersService.emailExists(user.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("success", false, "message", "Email already registered"));
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Users savedUser = usersService.registerNewUser(user);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "User registered successfully",
+                "user", savedUser));
     }
 
     // returns a user by its email

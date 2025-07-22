@@ -6,8 +6,9 @@ function isEmailValid(email) {
     return emailVerification.test(email);
 }
 
-//login user
+
 document.addEventListener('DOMContentLoaded', () => {
+    //login user
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
@@ -47,10 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
 
-//register user
-document.addEventListener('DOMContentLoaded', () => {
+
+    //register user
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async (event) => {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if( !isEmailValid(email)) {
+            if (!isEmailValid(email)) {
                 alert("Please enter a valid email address.");
                 return;
             }
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await register(user);
                 if (response.success) {
                     alert("Registration successful! You can now log in.");
+                    //redirect to login page
                     window.location.href = 'login.html';
                 } else {
                     alert("Registration failed: " + response.message);
@@ -92,4 +93,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+});  

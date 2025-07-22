@@ -14,7 +14,7 @@ import io.jsonwebtoken.security.Keys;
 // This class handles JWT authentication logic, such as generating security tokens with claims and expiration times.
 public class JWTAuthentication{
     private final String secretKey = "smartparkingsecretkey9876543210_";
-    private final long expirationTime = 1000 * 60 * 60 * 3; //3 hours
+    private final long expirationTime = 1000 * 60 * 60 * 1; // 1 hour
     private Key getKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }

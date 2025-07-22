@@ -13068,3 +13068,142 @@ button[type="submit"]:hover {
   align-items: center;
   justify-content: center;
 }
+
+.register-page .register-box input::placeholder {
+  color: #ddd; 
+  opacity: 1;
+}
+
+.forgot-password-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.forgot-password-page main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.reset-box {
+  width: 350px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px 30px;
+  border-radius: 16px;
+}
+
+.reset-box h2 {
+text-align: center;
+  margin-bottom:5px;
+  color: #b28cd9;
+  font-weight: 700;
+}
+
+.reset-box input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1.5px solid #b28cd9;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.forgot-password-page .reset-box input::placeholder {
+  color: #ddd; 
+  opacity: 1;
+}
+
+.reset-box input:focus {
+  border-color:  #b28cd9;
+  outline: none;
+  box-shadow: 0 0 6px rgba(111, 66, 193, 0.4);
+}
+
+.reset-box button[type="submit"] {
+width: 100%;
+  padding: 12px;
+  background-color: #b28cd9; 
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.reset-box button[type="submit"]:hover {
+  background-color: #b28cd9;
+  border-color: var(--bs-purple);
+}
+
+.reset-password-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.reset-password-page main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.reset-box {
+  width: 350px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px 30px;
+  border-radius: 16px;
+}
+
+.reset-box h2 {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #b28cd9;
+  font-weight: 700;
+}
+
+.reset-box input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1.5px solid #b28cd9;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.reset-password-page .reset-box input::placeholder {
+  color: #ddd;
+  opacity: 1;
+}
+
+.reset-box input:focus {
+  border-color: #b28cd9;
+  outline: none;
+  box-shadow: 0 0 6px rgba(111, 66, 193, 0.4);
+}
+
+.reset-box button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #b28cd9;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.reset-box button[type="submit"]:hover {
+  background-color: #a173c9;
+  border-color: var(--bs-purple);
+}

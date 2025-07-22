@@ -10,5 +10,4 @@ public class SmartParkingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SmartParkingApplication.class, args);
 	}
-
 }

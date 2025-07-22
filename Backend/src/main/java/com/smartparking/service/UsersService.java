@@ -86,7 +86,7 @@ public class UsersService {
         String tokenPassword = UUID.randomUUID().toString();
         resetPasswordService.createResetToken(user, tokenPassword);
 
-        String link = "https://frontend.com/reset-password?token=" + tokenPassword;
+        String link = "https://gray-smoke-0c9a20a03.2.azurestaticapps.net/reset-password.html?token=" + tokenPassword;
 
         String subject = "Reset password";
         String body = "Hello, " + user.getFirstName() + ",\n" 
