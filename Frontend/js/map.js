@@ -1,8 +1,5 @@
 import {get, put} from './backend-services.js';
 
-//const API_BASE_URL = 'https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net';
-const API_BASE_URL = 'http://localhost:8080';
-
 //For this project, OpenStreetMap is used as the base layer.
 //Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
 //The map is centered on the coordinates of the museum, with a zoom level of 19.

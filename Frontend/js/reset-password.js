@@ -43,9 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             console.log("Reset password form submitted.");
 
-            const token = document.getElementById('token').value.trim();
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
             const newPassword = document.getElementById('newPassword').value.trim();
             const confirmNewPassword = document.getElementById('confirmPassword').value.trim();
+            console.log("token:", token);
+            console.log("newPassword:", newPassword);
+            console.log("confirmNewPassword:", confirmNewPassword);
 
             if (!token || !newPassword || !confirmNewPassword) {
                 alert("Please fill in all fields.");
@@ -58,10 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await resetPassword(token, newPassword);
+                const response = await resetPassword(token, {
+                    newPassword,
+                    confirmNewPassword
+                }, { Authorization: undefined });
                 if (response && response.success) {
                     alert("Password successfully reset. You can now log in.");
-                    //redirect to login page
                     window.location.href = 'login.html';
                 } else {
                     alert("Reset password failed: " + response.message);

@@ -118,11 +118,25 @@ export async function requestPasswordReset(email) {
 }
 
 //reset password function
-export async function resetPassword(token, newPassword) {
+export async function resetPassword(token, data, customHeaders = {}) {
     try {
-        return await post('/resetPassword/reset', { token, newPassword }, {});
+        const response = await fetch(`${API_BASE_URL}/resetPassword/reset?token=${encodeURIComponent(token)}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                ...customHeaders
+            },
+            body: JSON.stringify(data)
+        });
+
+        const responseData = await readResponseAsJson(response);
+        return {
+            success: response.ok,
+            status: response.status,
+            ...responseData
+        };
     } catch (error) {
         console.error('Password reset error:', error);
         throw error;
     }
-}  
+}

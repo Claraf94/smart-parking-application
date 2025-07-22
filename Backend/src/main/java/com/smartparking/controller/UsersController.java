@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.smartparking.dto.PasswordResetRequest;
 import com.smartparking.dto.PasswordUpdateRequest;
 import com.smartparking.entity.Users;
 import com.smartparking.enums.UserType;
@@ -104,18 +103,6 @@ public class UsersController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         return ResponseEntity.ok().build();
-    }
-
-    // request to set a new password without being loggedin
-    @PostMapping("/resetTokenPassword")
-    public ResponseEntity<String> requestResetPassword(@RequestBody PasswordResetRequest request) {
-        boolean resetOperation = usersService.resetPasswordWithToken(request.getTokenPassword(),
-                request.getNewPassword());
-        if (resetOperation) {
-            return ResponseEntity.ok("Password was reset successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token for the operation.");
-        }
     }
 
     // request to set a new password being loggedin
