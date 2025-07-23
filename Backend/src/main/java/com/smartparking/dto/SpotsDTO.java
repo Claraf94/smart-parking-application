@@ -9,13 +9,13 @@ public class SpotsDTO {
     private String spotCode, locationDescription, spotColor;
     private SpotStatus status;
     private Double x, y;
-    boolean isReservable;
+    private Boolean isReservable;
     private List<List<Double>> boundaries;
     private List<Double> spotLabel;
 
     // Constructor
     public SpotsDTO(String spotCode, SpotStatus status, String locationDescription, String spotColor, Double x, Double y,
-                   boolean isReservable, List<List<Double>> boundaries, List<Double> spotLabel) {
+                   Boolean isReservable, List<List<Double>> boundaries, List<Double> spotLabel) {
         this.spotCode = spotCode;
         this.status = status;
         this.locationDescription = locationDescription;
@@ -79,12 +79,12 @@ public class SpotsDTO {
         this.y = y;
     }
 
-    public boolean isReservable() {
+    public Boolean getIsReservable() {
         return isReservable;
     }
 
-    public void setReservable(boolean reservable) {
-        isReservable = reservable;
+    public void setIsReservable(Boolean isReservable) {
+        this.isReservable = isReservable;
     }
 
     public List<List<Double>> getBoundaries() {

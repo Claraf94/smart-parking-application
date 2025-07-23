@@ -1,4 +1,4 @@
-import {get, put} from './backend-services.js';
+import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction } from './backend-services.js';
 
 //For this project, OpenStreetMap is used as the base layer.
 //Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
@@ -24,10 +24,13 @@ const map = L.map('map').setView([museumLat, museumLng], mapZoom);
 let parkingSquares = [];
 let spotLabels = [];
 let dragSpots = [];
-let parkingSpots = [];
 let userLatitude = 0;
 let userLongitude = 0;
 let currentRoute = null;
+let showRoute = false;
+let directions = [];
+let currentDirectionIndex = 0;
+
 
 //OpenStreetMap base map layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -35,27 +38,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data © OpenStreetMap contributors'
 }).addTo(map);
 
-//if allowed by the user, the current location is retrieved by using the geolocation
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(position => {
-    userLatitude = position.coords.latitude;
-    userLongitude = position.coords.longitude;
-    L.circleMarker([userLatitude, userLongitude], {
-      radius: 6,
-      color: 'red',
-      fillColor: 'red',
-      fillOpacity: 0.7
-    }).addTo(map).bindPopup("You are here");
-  });
-}
-
-//function to load all the parking spots and display them on the map
-async function loadSpots() {
+async function renderSpots() {
   try {
-    const spots = await get('/spots');
-    parkingSpots = spots;
-
-    //clear the previous spots from the map
+    const spots = await loadSpots();
+    if (!spots || spots.length === 0) {
+      console.warn("No parking spots found.");
+      return;
+    }
+    //clear the previous layers from the map
     parkingSquares.forEach(p => map.removeLayer(p));
     spotLabels.forEach(s => map.removeLayer(s));
     dragSpots.forEach(d => map.removeLayer(d));
@@ -66,31 +56,28 @@ async function loadSpots() {
     //define some colors based on the status to help the user identify the parking spot status
     //red for occupied, orange for reserved, yellow for maintenance, purple for spots that are empty but can be reserved,
     //and green for empty spots that cannot be reserved.
-    parkingSpots.forEach(spot => {
-      const latitude = spot.x;
-      const longitude = spot.y;
-      const boundaries = spot.boundaries;
-      const [centerLatitude, centerLongitude] = spot.spotLabel;
-      const spotColor = spot.spotColor;
+    spots.forEach(spot => {
+      const { x: latitude, y: longitude, spotCode, spotsID, boundaries, status, spotColor, spotLabel, isReservable, locationDescription } = spot;
+      const [centerLatitude, centerLongitude] = spotLabel;
 
       //this is the rectangle properties that represents visually the parking spot on the map
-      const parkingSpot = L.rectangle(boundaries, {
+      const spotRectangle = L.rectangle(boundaries, {
         color: spotColor,
         fillColor: spotColor,
         weight: 2,
         fillOpacity: 0.7
       }).addTo(map);
-      parkingSquares.push(parkingSpot);
+      parkingSquares.push(spotRectangle);
 
       //label properties with the spot code to help to identify which spot it is
-      const spotLabel = L.marker([centerLatitude, centerLongitude], {
+      const label = L.marker([centerLatitude, centerLongitude], {
         icon: L.divIcon({
           className: 'spot-label',
-          html: `<div style="font-size:8px; font-weight:bold; color:white;">${spot.spotCode}</div>`,
-          iconSize: [20, 10]
+          html: `<div style="font-size:8px; font-weight:bold; color:white;">${spotCode}</div>`,
+          iconSize: [15, 10]
         })
       }).addTo(map);
-      spotLabels.push(spotLabel);
+      spotLabels.push(label);
 
       //to help organize the spot on the map
       const dragSpot = L.marker([latitude, longitude], {
@@ -100,65 +87,142 @@ async function loadSpots() {
       dragSpots.push(dragSpot);
 
       //update the rectangle boundaries when the marker is dragged
-      dragSpot.on('drag', function (drag) {
-        const newCoordinates = drag.target.getLatLng();
+      dragSpot.on('drag', event => {
+        const newCoordinates = event.target.getLatLng();
         const newBoundaries = [
           [newCoordinates.lat, newCoordinates.lng],
           [newCoordinates.lat + deltaLatitude, newCoordinates.lng + deltaLongitude]
         ];
-        parkingSpot.setBounds(newBoundaries);
+        spotRectangle.setBounds(newBoundaries);
       });
 
       //save on the database the new coordinates
-      dragSpot.on('dragend', async function (saveDrag) {
-        const newCoordinates = saveDrag.target.getLatLng();
+      dragSpot.on('dragend', async event => {
+        const newCoordinates = event.target.getLatLng();
         try {
-          await put(`/spots/${spot.spotsID}`, {
-            x: newCoordinates.lat,
-            y: newCoordinates.lng
-          }, {
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbGFyYS5mcmVpdGFzQGhvdG1haWwuY29tIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE3NTI4Mzc0NzAsImV4cCI6MTc1Mjg0ODI3MH0.-mg1QQkKq0JMYIK7SsFh4YM71hledj6sHQ41WMFPrAo'
-          });
-          console.log(`Spot ${spot.spotCode} updated.`);
+          await updateSpotCoordinates(spotsID, newCoordinates.lat, newCoordinates.lng);
+          console.log(`Spot ${spotCode} updated.`);
         } catch (error) {
           console.error("Some error occurred while updating the spot:", error);
         }
       });
 
       //popup with the spot information
-      parkingSpot.bindPopup(`
-        <strong>${spot.spotCode}</strong><br>
-        Status: ${spot.status}<br>
-        Reservável: ${spot.isReservable ? 'Yes' : 'No'}<br>
-        ${spot.locationDescription}
+      spotRectangle.bindPopup(`
+        <strong>${spotCode}</strong><br>
+        Status: ${status}<br>
+        Reservable: ${(isReservable === true) ? 'Yes' : 'No'}
+        <button class="checkin-btn" data-id="${spotsID}" data-x="${latitude}" data-y="${longitude}">Check-In</button>
+        <button class="checkout-btn" data-id="${spotsID}" data-x="${latitude}" data-y="${longitude}">Check-Out</button>
       `);
+      spotRectangle.on('click', function (e) {
+        spotRectangle.openPopup(e.latlng);
+      });
     });
-
-    //trace the route from the user to the closest empty parking spot 
-    if (userLatitude && userLongitude) {
-      try {
-        const closestSpot = await get(`spots/closestSpot?x=${userLatitude}&y=${userLongitude}`);
-        if (currentRoute) map.removeControl(currentRoute);
-        currentRoute = L.Routing.control({
-          show: false,
-          addWaypoints: false,
-          waypoints: [
-            L.latLng(userLatitude, userLongitude),
-            L.latLng(closestSpot.x, closestSpot.y)
-          ],
-          routeWhileDragging: false,
-          draggableWaypoints: false,
-          createMarker: () => null
-        }).addTo(map);
-      } catch (error) {
-        console.error("Some error occurred while loading the closest spot:", error);
-      }
-    }
   } catch (error) {
-    console.error("Some error occurred while loading the spots:", error);
+    console.error("Some error occurred while loading parking spots:", error);
   }
 }
+
 //this function is called when the page is loaded to display the parking spots on the map
-document.addEventListener("DOMContentLoaded", loadSpots);
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Rendering parking spots...");
+  //if allowed by the user, the current location is retrieved by using the geolocation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      userLatitude = position.coords.latitude;
+      userLongitude = position.coords.longitude;
+      L.circleMarker([userLatitude, userLongitude], {
+        radius: 6,
+        color: 'purple',
+        fillColor: 'purple',
+        fillOpacity: 1.0
+      }).addTo(map).bindPopup("You are here");
+      renderSpots();
+    }, error => {
+      console.error("Geolocation error:", error);
+      alert("Unable to retrieve your location. Please enable location services.");
+      renderSpots();
+    });
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+    renderSpots();
+  }
+});
+
 //this will refresh the parking spots every 10 seconds
-setInterval(loadSpots, refreshInterval);
+setInterval(renderSpots, refreshInterval);
+
+//function to get the closest empty spot
+document.getElementById('routeBtn').addEventListener('click', async () => {
+  if (showRoute && currentRoute) {
+    map.removeControl(currentRoute);
+    showRoute = false;
+    currentRoute = null;
+    return;
+  }
+  if (userLatitude && userLongitude)
+    try {
+      const closestSpot = await getClosestSpot(userLatitude, userLongitude);
+      //remove the previous route if it exists to create a new one
+      if (currentRoute) {
+        map.removeControl(currentRoute);
+      }
+      currentRoute = L.Routing.control({
+        show: false,
+        addWaypoints: [false],
+        draggableWaypoints: false,
+        routeWhileDragging: false,
+        waypoints: [
+          L.latLng(userLatitude, userLongitude),
+          L.latLng(closestSpot.x, closestSpot.y)
+        ],
+        lineOptions: {
+          styles: [{ color: 'purple', opacity: 0.5, weight: 3 }]
+        },
+        createPointer: () => null
+      }).addTo(map);
+      L.circleMarker([closestSpot.x, closestSpot.y], {
+        radius: 6,
+        color: 'purple',
+        fillColor: 'purple',
+        fillOpacity: 0.7
+      }).addTo(map).bindPopup("Closest empty spot");
+      showRoute = true;
+      currentRoute.on('routesfound', (event) => {
+        directions = event.routes[0].instructions;
+        currentDirectionIndex = 0;
+        if (directions.length > 0) {
+          const instr = directions[0];
+          document.getElementById('routeInstructions').innerText = instr.text;
+          speakInstruction(instr.text);
+        }
+      });
+
+      navigator.geolocation.watchPosition(position => {
+        const currentLatitude = position.coords.latitude;
+        const currentLongitude = position.coords.longitude;
+
+        if (directions.length === 0 || currentDirectionIndex >= directions.length) return;
+
+        const currentInstr = directions[currentDirectionIndex];
+        const instrLatitude = currentInstr.latLng.lat;
+        const instrLongitude = currentInstr.latLng.lng;
+
+        const distance = map.distance(
+          L.latLng(currentLatitude, currentLongitude),
+          L.latLng(instrLatitude, instrLongitude)
+        );
+
+        if (distance < 10) {
+          speakDirection(currentInstr.text);
+          currentDirectionIndex++;
+          const instrDiv = document.getElementById('routeInstructions');
+          if (instrDiv) instrDiv.innerText = currentInstr.text;
+        }
+      });
+    } catch (error) {
+      console.error("Some error occurred while trying to trace the route:", error);
+      alert("Error finding the closest spot.");
+    }
+});

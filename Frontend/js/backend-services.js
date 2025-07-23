@@ -1,5 +1,5 @@
-const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-//const API_BASE_URL = "http://localhost:8080";
+//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+const API_BASE_URL = "http://localhost:8080";
 
 //function to add headers to the request
 function getAuthHeaders(extraHeaders = {}) {
@@ -139,4 +139,32 @@ export async function resetPassword(token, data, customHeaders = {}) {
         console.error('Password reset error:', error);
         throw error;
     }
+}
+
+//function to load all the parking spots and display them on the map
+export async function loadSpots(){
+    return await get('/spots');
+}
+
+//update the coordinates of a spot function
+export async function updateSpotCoordinates(spotId, x, y) {
+    try {
+        return await put(`/spots/${spotId}`, {x,y});
+    } catch (error) {
+        console.error('Error updating spot coordinates:', error);
+        throw error;
+    }
+}
+
+//get the closest empty spot function
+export async function getClosestSpot(userLatitude, userLongitude) {
+    return await get(`/spots/closestSpot?x=${userLatitude}&y=${userLongitude}`);
+}
+
+// text-to-speech function to assist drivers
+export function speakInstruction(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1;
+    speechSynthesis.speak(utterance);
 }

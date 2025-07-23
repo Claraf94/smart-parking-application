@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await login(email, password);
                 if (response.token) {
                     localStorage.setItem('token', response.token);
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'user-dashboard.html';
                 } else {
                     alert("Login failed. Please check your credentials.");
                 }

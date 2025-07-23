@@ -12912,6 +12912,19 @@ body.parking-page footer {
   z-index: 1000;
 }
 
+#routeBtn{
+  position: absolute;
+  top: 100px;
+  right: 100px;
+  z-index: 1500;
+  padding: 8px;
+  background-color: #b28cd9;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(111, 66, 193, 0.4);
+}
+
 .spot-label {
   pointer-events: none;
   text-align: center;
