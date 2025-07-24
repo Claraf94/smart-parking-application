@@ -1,22 +1,25 @@
-import { checkIn, checkOut } from "./api-services";
+import { checkIn, checkOut } from "./api-services.js";
 
-document.addEventListener("click", async (event) => {
+document.addEventListener('click', async (event) => {
     if(event.target.classList.contains("checkin-btn")) {
-        const spotId = event.target.dataset.spotId;
+        const spotCode = event.target.getAttribute("data-code");
         try {
-            await checkIn(spotId);
-            alert("Check-in done!");
+            await checkIn(spotCode);
+            alert(`Check-in done at spot ${spotCode}.`);
+            location.reload(); // Reload the page to reflect the current parking status
         } catch (error) {
-            alert(error.message || "Something went wrong during check-in.");
-        }   
+            alert(`Something went wrong during check-in: ${error.response?.data || error.message}`);
+        }
     }
     if(event.target.classList.contains("checkout-btn")) {
-        const spotId = event.target.dataset.spotId;
+        const spotCode = event.target.getAttribute("data-code");
         try {
-            await checkOut(spotId);
-            alert("Check-out done!");
+            await checkOut(spotCode);
+            alert(`Check-out done at spot ${spotCode}.`);
+            location.reload(); // Reload the page to reflect the current parking status
         } catch (error) {
-            alert(error.message || "Something went wrong during check-out.");
+            alert(`Something went wrong during check-out: ${error.response?.data || error.message}`);
         }
     }
 });
+

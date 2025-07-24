@@ -110,8 +110,8 @@ async function renderSpots() {
         <strong>${spotCode}</strong><br>
         Status: ${status}<br>
         Reservable: ${(isReservable === true) ? 'Yes' : 'No'}<br>
-        <button class="checkin-btn" data-spot-id="${spotsID}" data-code="${spotCode}" data-x="${latitude}" data-y="${longitude}">Check-In</button>
-        <button class="checkout-btn" data-spot-id="${spotsID}" data-code="${spotCode}" data-x="${latitude}" data-y="${longitude}">Check-Out</button>
+        <button class="checkin-btn" data-code="${spotCode}">Check-In</button>
+        <button class="checkout-btn" data-code="${spotCode}">Check-Out</button>
       </div>
       `);
       spotRectangle.on('click', function (event) {

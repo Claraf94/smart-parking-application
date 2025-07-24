@@ -176,12 +176,11 @@ export function speakInstruction(text) {
 
 // --------- PARKING TRACK FUNCTIONS ----------
 //check in function
-export async function checkIn(spotId) {
-    return await put(`/parkingTrack/checkin/${spotId}`, {});
+export async function checkIn(spotCode) {
+    return await put(`/parkingTrack/checkin/${spotCode}`);
 }
 
-//check out function
-export async function checkOut(spotId) {
-    return await put(`/parkingTrack/checkout/${spotId}`, {});
+export async function checkOut(spotCode) {
+    return await put(`/parkingTrack/checkout/${spotCode}`);
 }
 
