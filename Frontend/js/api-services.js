@@ -1,7 +1,8 @@
 //const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
 const API_BASE_URL = "http://localhost:8080";
 
-//function to add headers to the request
+// ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
+//function to add authentication headers to the request
 function getAuthHeaders(extraHeaders = {}) {
     const token = localStorage.getItem('token');
     return {
@@ -69,7 +70,8 @@ async function del(endpoint, headers = {}) {
     }
     return responseData;
 }
-// Export functions for use in other modules
+
+// Export HTTP methods for use in other modules
 export {
     get,
     post,
@@ -87,6 +89,7 @@ async function readResponseAsJson(response) {
     }
 }
 
+// --------- AUTHENTICATION AND USER FUNCTIONS ----------
 //authentication function
 export async function login(email, password) {
     try {
@@ -141,6 +144,7 @@ export async function resetPassword(token, data, customHeaders = {}) {
     }
 }
 
+// --------- PARKING SPOTS FUNCTIONS ----------
 //function to load all the parking spots and display them on the map
 export async function loadSpots(){
     return await get('/spots');
@@ -161,10 +165,23 @@ export async function getClosestSpot(userLatitude, userLongitude) {
     return await get(`/spots/closestSpot?x=${userLatitude}&y=${userLongitude}`);
 }
 
-// text-to-speech function to assist drivers
+// ------ VOICE ASSISTANCE FUNCTION ------
+//function to assist drivers with navigation instructions
 export function speakInstruction(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 1;
-    speechSynthesis.speak(utterance);
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    speech.rate = 1;
+    speechSynthesis.speak(speech);
 }
+
+// --------- PARKING TRACK FUNCTIONS ----------
+//check in function
+export async function checkIn(spotId) {
+    return await put(`/parkingTrack/checkin/${spotId}`, {});
+}
+
+//check out function
+export async function checkOut(spotId) {
+    return await put(`/parkingTrack/checkout/${spotId}`, {});
+}
+

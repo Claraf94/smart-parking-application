@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.smartparking.dto.CoordinatesRequest;
+import com.smartparking.dto.CoordinatesRequestDTO;
 import com.smartparking.dto.SpotsDTO;
 import com.smartparking.entity.Spots;
 import com.smartparking.enums.SpotStatus;
@@ -73,7 +73,7 @@ public class SpotsController {
     // update coorinates of a parking spot
     @PreAuthorize("hasRole('ADMIN')") // only admin can update coordinates of parking spots on the system
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCoordinates(@PathVariable int id, @RequestBody CoordinatesRequest coordinates) {
+    public ResponseEntity<String> updateCoordinates(@PathVariable int id, @RequestBody CoordinatesRequestDTO coordinates) {
         Optional<Spots> spotOp = spotsRepository.findById(id);
 
         if (spotOp.isEmpty()) {

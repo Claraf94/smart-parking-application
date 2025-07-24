@@ -13220,3 +13220,17 @@ width: 100%;
   background-color: #a173c9;
   border-color: var(--bs-purple);
 }
+
+.spot-popup {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.spot-popup button {
+  margin-top: 5px;
+  background-color: #b28cd9;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}

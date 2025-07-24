@@ -1,17 +1,17 @@
 package com.smartparking.dto;
 
-public class CoordinatesRequest {
+public class CoordinatesRequestDTO {
     //declare variables
     private Double x, y;
 
     //constructor
-    public CoordinatesRequest(Double x, Double y) {
+    public CoordinatesRequestDTO(Double x, Double y) {
         this.x = x;
         this.y = y;
     }
     
     //default constructor
-    public CoordinatesRequest() {}
+    public CoordinatesRequestDTO() {}
 
     //getters and setters
     public Double getX() {

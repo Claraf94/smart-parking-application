@@ -1,4 +1,4 @@
-import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction } from './backend-services.js';
+import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction} from './api-services.js';
 
 //For this project, OpenStreetMap is used as the base layer.
 //Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
@@ -9,18 +9,17 @@ import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction } fr
 const museumLat = 53.34895;
 const museumLng = -6.2872;
 const mapZoom = 19;
+const refreshInterval = 10000; //each 10 seconds the map will be refreshed
 
-//approximately size of a parking spot in meters converted to degrees(latitude and longitude).
-const deltaLatitude = 0.00005;
-const deltaLongitude = 0.000040;
-
-//automatic refresh of the map that happens every 10 seconds
-const refreshInterval = 10000;
-
-//initialize the map with leaflet
+//initialize leaflet map
 const map = L.map('map').setView([museumLat, museumLng], mapZoom);
+//OpenStreetMap base map layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 21,
+  attribution: 'Map data © OpenStreetMap contributors'
+}).addTo(map);
 
-//store the spots and labels in the map in a list
+//store the spots and labels in the map in a list of layers
 let parkingSquares = [];
 let spotLabels = [];
 let dragSpots = [];
@@ -32,12 +31,6 @@ let directions = [];
 let currentDirectionIndex = 0;
 
 
-//OpenStreetMap base map layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 21,
-  attribution: 'Map data © OpenStreetMap contributors'
-}).addTo(map);
-
 async function renderSpots() {
   try {
     const spots = await loadSpots();
@@ -46,9 +39,7 @@ async function renderSpots() {
       return;
     }
     //clear the previous layers from the map
-    parkingSquares.forEach(p => map.removeLayer(p));
-    spotLabels.forEach(s => map.removeLayer(s));
-    dragSpots.forEach(d => map.removeLayer(d));
+    [...parkingSquares, ...spotLabels, ...dragSpots].forEach(p => map.removeLayer(p));
     parkingSquares = [];
     spotLabels = [];
     dragSpots = [];
@@ -65,7 +56,8 @@ async function renderSpots() {
         color: spotColor,
         fillColor: spotColor,
         weight: 2,
-        fillOpacity: 0.7
+        fillOpacity: 0.7,
+        interactive: true
       }).addTo(map);
       parkingSquares.push(spotRectangle);
 
@@ -82,7 +74,8 @@ async function renderSpots() {
       //to help organize the spot on the map
       const dragSpot = L.marker([latitude, longitude], {
         draggable: true,
-        opacity: 0 // invisible marker
+        opacity: 0,
+        interactive: false,
       }).addTo(map);
       dragSpots.push(dragSpot);
 
@@ -109,14 +102,16 @@ async function renderSpots() {
 
       //popup with the spot information
       spotRectangle.bindPopup(`
+        <div class="spot-popup">
         <strong>${spotCode}</strong><br>
         Status: ${status}<br>
-        Reservable: ${(isReservable === true) ? 'Yes' : 'No'}
-        <button class="checkin-btn" data-id="${spotsID}" data-x="${latitude}" data-y="${longitude}">Check-In</button>
-        <button class="checkout-btn" data-id="${spotsID}" data-x="${latitude}" data-y="${longitude}">Check-Out</button>
+        Reservable: ${(isReservable === true) ? 'Yes' : 'No'}<br>
+        <button class="checkin-btn" data-spot-id="${spotsID}" data-code="${spotCode}" data-x="${latitude}" data-y="${longitude}">Check-In</button>
+        <button class="checkout-btn" data-spot-id="${spotsID}" data-code="${spotCode}" data-x="${latitude}" data-y="${longitude}">Check-Out</button>
+      </div>
       `);
-      spotRectangle.on('click', function (e) {
-        spotRectangle.openPopup(e.latlng);
+      spotRectangle.on('click', function (event) {
+        spotRectangle.openPopup(event.latlng);
       });
     });
   } catch (error) {
