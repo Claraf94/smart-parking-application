@@ -11,6 +11,10 @@ const museumLng = -6.2872;
 const mapZoom = 19;
 const refreshInterval = 10000; //each 10 seconds the map will be refreshed
 
+//approximately size of a parking spot in meters converted to degrees(latitude and longitude).
+const deltaLatitude = 0.00005;
+const deltaLongitude = 0.000040;
+
 //initialize leaflet map
 const map = L.map('map').setView([museumLat, museumLng], mapZoom);
 //OpenStreetMap base map layer
