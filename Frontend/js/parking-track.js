@@ -1,4 +1,4 @@
-import { checkIn, checkOut } from "./api-services.js";
+import { checkIn, checkOut } from "./api-calls.js";
 
 document.addEventListener('click', async (event) => {
     if(event.target.classList.contains("checkin-btn")) {

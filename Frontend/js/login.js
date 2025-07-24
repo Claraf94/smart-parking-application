@@ -1,4 +1,4 @@
-import { login, register } from './api-services.js';
+import { login, register } from './api-calls.js';
 
 //simple function to check the email format
 function isEmailValid(email) {

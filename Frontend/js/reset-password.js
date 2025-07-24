@@ -1,4 +1,4 @@
-import { requestPasswordReset, resetPassword } from './api-services.js';
+import { requestPasswordReset, resetPassword } from './api-calls.js';
 
 //simple function to check the email format
 function isEmailValid(email) {

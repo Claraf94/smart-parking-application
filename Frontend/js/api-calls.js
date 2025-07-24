@@ -19,12 +19,12 @@ async function get(endpoint, headers = {}) {
         method: 'GET',
         headers: getAuthHeaders(headers)
     });
-    const data = await readResponseAsJson(response);
+    const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = data.Error || data.message || 'Unknown error';
+        const errorMessage = responseData.Error || responseData.message || 'Unknown error';
         throw new Error(errorMessage);
     }
-    return data;
+    return responseData;
 }
 
 //POST requests
@@ -180,7 +180,18 @@ export async function checkIn(spotCode) {
     return await put(`/parkingTrack/checkin/${spotCode}`);
 }
 
+//check out function
 export async function checkOut(spotCode) {
     return await put(`/parkingTrack/checkout/${spotCode}`);
 }
 
+// --------- RESERVATION FUNCTIONS ----------
+//get all reservable spots function
+export async function getReservableSpots(){
+    return await get(`/spots?isReservable=true`);
+}
+
+//create a reservation function
+export async function createReservation(reservationData) {
+    return await post('/reservations/create', reservationData);
+}

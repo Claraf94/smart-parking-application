@@ -1,4 +1,4 @@
-import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction} from './api-services.js';
+import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction} from './api-calls.js';
 
 //For this project, OpenStreetMap is used as the base layer.
 //Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
