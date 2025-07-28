@@ -3,6 +3,7 @@ package com.smartparking.entity;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,7 @@ public class Reservations {
     private String numberPlate;
     @Column(name = "startTime", nullable = false) // start, end and reservedAt times cannot be null
     @NotNull(message = "Start time cannot be null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
     @Column(name = "endTime", nullable = false)
     private LocalDateTime endTime;

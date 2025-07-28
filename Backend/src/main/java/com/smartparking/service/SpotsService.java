@@ -130,4 +130,9 @@ public class SpotsService {
         return new SpotsDTO(spot.getSpotCode(), spot.getStatus(), spot.getLocationDescription(), spotColor,
                 spot.getX(), spot.getY(), spot.getIsReservable(), boundaries, spotLabel);
     }
+
+    public void updateSpotStatus(Spots spot, SpotStatus status) {
+        spot.setStatus(status);
+        spotsRepository.save(spot);
+    }
 }// spots service class

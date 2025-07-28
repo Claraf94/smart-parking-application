@@ -13293,18 +13293,6 @@ button[type="submit"]:hover {
   border-color: #b28cd9;
 }
 
-#reservationDateTime{
-  position: relative;
-}
-
-.tempus-dominus-widget {
-  color: #b28cd9 !important;
-  z-index: 1060 !important; 
-  position: absolute !important;
-  left: 0 !important;
-  margin-top: 5px;
-}
-
 .reservation-box input::placeholder {
   color: #ddd;
   opacity: 1;
@@ -13314,6 +13302,38 @@ button[type="submit"]:hover {
   border-color: #b28cd9;
   outline: none;
   box-shadow: 0 0 6px rgba(111, 66, 193, 0.4);
+}
+
+.flatpickr-calendar,
+.flatpickr-day,
+.flatpickr-time input,
+.flatpickr-weekday,
+.flatpickr-current-month,
+.flatpickr-monthDropdown-months,
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month,
+.flatpickr-time .flatpickr-am-pm {
+  color: #b28cd9 !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.today,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange {
+  background: #b28cd9 !important;
+  border-color: #b28cd9 !important;
+  color: white !important;
+}
+.calendar-icon{
+  cursor: pointer;
+  border: none;
+  background-color: #b28cd9;
+  color: white;
+}
+
+.calendar-icon:hover {
+  color: #a173c9;
 }
 
 .reservation-box button[type="submit"] {

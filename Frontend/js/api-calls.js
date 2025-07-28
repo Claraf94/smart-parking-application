@@ -146,14 +146,14 @@ export async function resetPassword(token, data, customHeaders = {}) {
 
 // --------- PARKING SPOTS FUNCTIONS ----------
 //function to load all the parking spots and display them on the map
-export async function loadSpots(){
+export async function loadSpots() {
     return await get('/spots');
 }
 
 //update the coordinates of a spot function
 export async function updateSpotCoordinates(spotId, x, y) {
     try {
-        return await put(`/spots/${spotId}`, {x,y});
+        return await put(`/spots/${spotId}`, { x, y });
     } catch (error) {
         console.error('Error updating spot coordinates:', error);
         throw error;
@@ -187,7 +187,7 @@ export async function checkOut(spotCode) {
 
 // --------- RESERVATION FUNCTIONS ----------
 //get all reservable spots function
-export async function getReservableSpots(){
+export async function getReservableSpots() {
     return await get(`/spots?isReservable=true`);
 }
 

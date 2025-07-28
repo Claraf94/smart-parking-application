@@ -42,6 +42,7 @@ public class ReservationsController {
         if(reservation.getReservationStatus() == null){
             reservation.setReservationStatus(ReservationStatus.ACTIVE);
         }
+        System.out.println("Creating reservation: " + reservation);
         Reservations savedReservation = reservationsService.createReservation(reservation);
         return ResponseEntity.ok(savedReservation);
     }

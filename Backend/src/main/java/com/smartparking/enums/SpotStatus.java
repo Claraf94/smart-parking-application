@@ -4,5 +4,6 @@ public enum SpotStatus {
         EMPTY,
         OCCUPIED,
         RESERVED,
-        MAINTENANCE
+        MAINTENANCE,
+        CANCELLED;
 }

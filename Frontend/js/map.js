@@ -53,6 +53,7 @@ async function renderSpots() {
     //and green for empty spots that cannot be reserved.
     spots.forEach(spot => {
       const { x: latitude, y: longitude, spotCode, spotsID, boundaries, status, spotColor, spotLabel, isReservable, locationDescription } = spot;
+            console.log(`Spot ${spotCode} has status: ${status}`);
       const [centerLatitude, centerLongitude] = spotLabel;
 
       //this is the rectangle properties that represents visually the parking spot on the map
