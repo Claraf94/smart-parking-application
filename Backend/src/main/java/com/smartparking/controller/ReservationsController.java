@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -94,8 +95,7 @@ public class ReservationsController {
     }
 
     //delete a reservation by ID
-    @DeleteMapping("/cancel/{reservationId}")
-    //response body will be void/empty 
+    @PutMapping(value = "/cancel/{reservationId}", consumes = "application/json") 
     public ResponseEntity<Void> deleteReservation(@PathVariable int reservationId) {
         reservationsService.cancelReservation(reservationId);
         return ResponseEntity.noContent().build();

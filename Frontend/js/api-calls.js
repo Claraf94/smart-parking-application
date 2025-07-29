@@ -1,5 +1,5 @@
-//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+//const API_BASE_URL = "http://localhost:8080";
 
 // ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
 //function to add authentication headers to the request
@@ -195,3 +195,21 @@ export async function getReservableSpots() {
 export async function createReservation(reservationData) {
     return await post('/reservations/create', reservationData);
 }
+
+//get history of reservations function
+export async function getUserReservationHistory() {
+    return await get('/reservations/user');
+}
+
+//cancel reservation function
+export async function cancelReservationById(reservationId) {
+    return await put(`/reservations/cancel/${reservationId}`);
+}
+
+// --------- NOTIFICATION FUNCTIONS ----------
+
+//get all notifications received function
+export async function getNotifications() {
+    return await get('/notifications/user');
+}
+

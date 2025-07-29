@@ -197,4 +197,9 @@ public class NotificationsService{
             setEmailService.sendEmailConfig(user.getEmail(), subject, message);
         }
     }
+
+    public List<Notifications> getNotifications(Users user) {
+        //returns all notifications for a specific user
+        return notificationsRepository.findByUser(user);
+    }
 }//notifications service class

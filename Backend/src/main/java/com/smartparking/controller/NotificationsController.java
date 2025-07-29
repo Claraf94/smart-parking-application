@@ -106,4 +106,18 @@ public class NotificationsController {
         notificationsService.sendNotificationToAllUsers(request.getMessage(), request.getSubject());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    //get all notifications for the authenticated user
+    @GetMapping("/user")
+    public ResponseEntity<List<Notifications>> getNotifications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Optional<Users> user = usersService.findByEmail(authentication.getName());
+        if(user.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(notificationsService.getNotifications(user.get()));
+    }
 }//notifications controller class

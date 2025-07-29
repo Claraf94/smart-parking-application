@@ -1,6 +1,8 @@
-import { getReservableSpots, createReservation } from "./api-calls.js";
+import { getReservableSpots, createReservation, getUserReservationHistory, cancelReservationById } from "./api-calls.js";
+import {checkAuthenticationToken} from "./authentication-help.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    checkAuthenticationToken();
     try {
         const phoneNumberValue = document.querySelector("#phoneNumber");
         phoneNumberValue.addEventListener('keydown', (event) => {
@@ -36,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         //calendar
         const calendar = flatpickr("#startTime", {
             enableTime: true,
-            dateFormat: "Y-m-d\\TH:i",
+            dateFormat: "Y-m-d H:i",
             time_24hr: true,
             defaultDate: new Date(),
             position: "above"
@@ -74,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const formattedPhone = iti.getNumber();
                 await createReservation({ spot: { spotCode }, phoneNumber: formattedPhone, numberPlate, startTime });
                 alert("Reservation created successfully!");
+                await loadUserReservationHistory();
                 //cleaning the form
                 document.getElementById('reservationForm').reset();
                 calendar.setDate(new Date());
@@ -83,7 +86,61 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert("Reservation could not be created. Please try again.");
             }
         });
+        await loadUserReservationHistory();
     } catch (error) {
         console.error('Error retrieving reservable spots:', error);
     }
 });
+
+async function loadUserReservationHistory() {
+    const content = document.getElementById('historyList');
+    content.innerHTML = '';
+    try {
+        const backup = await getUserReservationHistory();
+        if (!backup || backup.length === 0) {
+            content.innerHTML = '<p>No reservations history.</p>';
+            return;
+        }
+        backup.reverse().forEach(res => {
+            const div = document.createElement('div');
+            div.className = 'reservation-item';
+            div.innerHTML = `
+            <div class="reservation-card">
+                <div class="reservation-details">
+                    <strong>Reservation ID:</strong> ${res.reservationID}<br>
+                    <strong>Phone:</strong> ${res.phoneNumber}<br>
+                    <strong>Number Plate:</strong> ${res.numberPlate}<br>
+                    <strong>Date:</strong> ${new Date(res.startTime).toLocaleDateString()}<br>
+                    <strong>Time:</strong> ${new Date(res.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br>
+                    <strong>Spot:</strong> ${res.spot.spotCode}<br>
+                    <strong>Status:</strong> ${res.reservationStatus}<br>
+                </div>
+            </div>
+            `;
+
+            //in case the user needs to cancel a reservation that is active
+            if (res.reservationStatus === 'ACTIVE') {
+                const cancelButton = document.createElement('button');
+                cancelButton.className = 'btn btn-sm btn-danger mt-2';
+                cancelButton.textContent = 'Cancel';
+                cancelButton.addEventListener('click', async () => {
+                    if (confirm("Are you sure you want to cancel this reservation?")) {
+                        try {
+                            await cancelReservationById(res.reservationID);
+                            alert("Reservation cancelled");
+                            await loadUserReservationHistory();
+                        } catch (error) {
+                            console.error('Error cancelling reservation:', error);
+                            alert("Reservation could not be cancelled. Please try again.");
+                        }
+                    }
+                });
+                div.querySelector('.reservation-card').appendChild(cancelButton);
+            }
+            content.appendChild(div);
+        });
+    } catch (error) {
+        console.error("Error loading reservation history:", error);
+    }
+}
+

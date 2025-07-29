@@ -1,4 +1,5 @@
 import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction} from './api-calls.js';
+import {checkAuthenticationToken} from './authentication-help.js'
 
 //For this project, OpenStreetMap is used as the base layer.
 //Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
@@ -126,6 +127,7 @@ async function renderSpots() {
 
 //this function is called when the page is loaded to display the parking spots on the map
 document.addEventListener("DOMContentLoaded", () => {
+  checkAuthenticationToken();
   console.log("Rendering parking spots...");
   //if allowed by the user, the current location is retrieved by using the geolocation
   if (navigator.geolocation) {

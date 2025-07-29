@@ -16,7 +16,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- telephone cloud validator CSS -->
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.19/build/css/intlTelInput.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.19/build/css/intlTelInput.min.css" />
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
@@ -41,38 +41,56 @@
     </nav>
 
     <!-- Reservation section -->
-    <main class="main-reservation d-flex align-items-center justify-content-center">
-        <div class="reservation-box shadow p-4 rounded-4">
-            <h2 class="text-center mb-4">Reserve a Spot</h2>
-            <form id="reservationForm">
-                <div class="reservation-form mb-3">
-                    <label for="spotCode" class="form-label">Parking Spot:</label>
-                    <select class="form-control select-custom" id="spotCode" required>
-                        <option value="" disabled selected>Select a parking spot</option>
-                    </select>
-                </div>
-                <div class="reservation-form mb-3">
-                    <label for="phoneNumber" class="form-label">Phone Number:</label>
-                    <input type="tel" class="form-control" id="phoneNumber" required />
-                </div>
-                <div class="reservation-form mb-3">
-                    <label for="numberPlate" class="form-label">Number Plate:</label>
-                    <input type="text" class="form-control" id="numberPlate" placeholder="e.g. 01-D-23456" required />
-                </div>
-                <div class="reservation-form mb-3">
-                    <label for="startTime" class="form-label">Start Time:</label>
-                    <div class="input-group">
-                        <input type="text" id="startTime" class="form-control" placeholder="Select date and time"
-                            required />
-                        <span class="input-group-text calendar-icon" id="calendarIcon"><i
-                                class="bi bi-calendar"></i></span>
+    <main class="main-reservation py-5">
+        <div class="container d-flex justify-content-center">
+            <div class="row gx-5 layout-equal-boxes">
+                <!-- Reservation form -->
+                <div class="col-md-6 mb-4">
+                    <div class="reservation-box shadow p-4 rounded-4 h-100 d-flex flex-column justify-content-between">
+                        <h2 class="text-center mb-4">Reserve a Spot</h2>
+                        <form id="reservationForm" class="d-flex flex-column justify-content-between flex-grow-1">
+                            <div>
+                                <div class="reservation-form mb-3">
+                                    <label for="spotCode" class="form-label">Parking Spot:</label>
+                                    <select class="form-control select-custom" id="spotCode" required>
+                                        <option value="" disabled selected>Select a parking spot</option>
+                                    </select>
+                                </div>
+                                <div class="reservation-form mb-3">
+                                    <label for="phoneNumber" class="form-label">Phone Number:</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" required />
+                                </div>
+                                <div class="reservation-form mb-3">
+                                    <label for="numberPlate" class="form-label">Number Plate:</label>
+                                    <input type="text" class="form-control" id="numberPlate"
+                                        placeholder="e.g. 01-D-23456" required />
+                                </div>
+                                <div class="reservation-form mb-3">
+                                    <label for="startTime" class="form-label">Start Time:</label>
+                                    <div class="input-group">
+                                        <input type="text" id="startTime" class="form-control"
+                                            placeholder="Select date and time" required />
+                                        <span class="input-group-text calendar-icon" id="calendarIcon">
+                                            <i class="bi bi-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        </form>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+
+                <!-- Reservation history -->
+                <div class="col-md-6 mb-4">
+                    <div class="reservation-box shadow p-4 rounded-4 h-100 d-flex flex-column">
+                        <h2 class="text-center mb-3">Reservation History</h2>
+                        <div id="historyList" class="overflow-auto flex-grow-1"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
-
     <!-- Footer-->
     <footer class="bg-light py-3">
         <div class="container px-4 px-lg-5">

@@ -1,5 +1,4 @@
 import { requestPasswordReset, resetPassword } from './api-calls.js';
-
 //simple function to check the email format
 function isEmailValid(email) {
     const emailVerification = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -7,6 +6,7 @@ function isEmailValid(email) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
     const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     if (forgotPasswordForm) {
         forgotPasswordForm.addEventListener('submit', async (event) => {

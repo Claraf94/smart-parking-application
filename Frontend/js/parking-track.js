@@ -1,6 +1,7 @@
 import { checkIn, checkOut } from "./api-calls.js";
-
+import { checkAuthenticationToken } from "./authentication-help.js";
 document.addEventListener('click', async (event) => {
+    checkAuthenticationToken();
     if(event.target.classList.contains("checkin-btn")) {
         const spotCode = event.target.getAttribute("data-code");
         try {

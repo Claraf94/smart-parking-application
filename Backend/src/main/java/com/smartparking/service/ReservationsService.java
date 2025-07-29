@@ -36,6 +36,9 @@ public class ReservationsService {
         if (reservation.getStartTime() == null) {
             throw new IllegalArgumentException("Start time is required. Please define it.");
         }
+        if (reservation.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Reservation time must be in the future.");
+        }
         // check if the spot exists first
         Spots spot = reservation.getSpot();
         if (spot == null || spot.getSpotCode() == null || spot.getSpotCode().isEmpty()) {
@@ -135,6 +138,10 @@ public class ReservationsService {
         }
         // cancel a reservation by ID
         Reservations res = reservationsRepository.findById(reservationID).get();
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(res.getStartTime())) {
+            throw new IllegalArgumentException("The reservation cannot be cancelled after the start time.");
+        }
         res.setReservationStatus(ReservationStatus.CANCELLED);
         reservationsRepository.save(res);
 
@@ -143,5 +150,12 @@ public class ReservationsService {
             notificationsService.createNotificationForUser(user, NotificationType.RESERVATION_CANCELLED,
                     "The reservation was cancelled succesfully.");
         }
+        List<Reservations> activeReservations = reservationsRepository.findBySpotAndReservationStatus(
+                res.getSpot(), ReservationStatus.ACTIVE);
+
+        if (activeReservations.isEmpty()) {
+            spotsService.updateSpotStatus(res.getSpot(), SpotStatus.EMPTY);
+        }
+
     }
 }// reservations service class
