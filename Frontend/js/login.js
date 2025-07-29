@@ -33,9 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await login(email, password);
                 if (response.token) {
                     localStorage.setItem('token', response.token);
-                    window.location.href = 'user-dashboard.html';
-                } else {
-                    alert("Login failed. Please check your credentials.");
+                    const payloadBase64 = response.token.split('.')[1];
+                    const decodedPayload = JSON.parse(atob(payloadBase64));
+                    const roles = decodedPayload.roles || decodedPayload.authorities;
+                    if (roles.includes('ROLE_ADMIN')) {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'user-dashboard.html';
+                    }
                 }
             } catch (error) {
                 if (error.message.includes("Email not found")) {

@@ -1,8 +1,8 @@
 import { loadSpots, updateSpotCoordinates, getClosestSpot, speakInstruction} from './api-calls.js';
-import {checkAuthenticationToken} from './authentication-help.js'
+import { checkAuthenticationToken, getUserRoleFromToken } from './authentication-help.js'
 
 //For this project, OpenStreetMap is used as the base layer.
-//Also, a part of the area of the National Museum of Ireland was chosen as the parking area.
+//Also, a part of the area of the National Museum of Ireland was chosen as the parking area for simulation.
 //The map is centered on the coordinates of the museum, with a zoom level of 19.
 
 /* General configuration */
@@ -23,6 +23,11 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 21,
   attribution: 'Map data © OpenStreetMap contributors'
 }).addTo(map);
+
+//get the role from the token
+const userRole = getUserRoleFromToken();
+console.log("User role from token:", userRole);
+const isAdmin = userRole === 'ROLE_ADMIN';
 
 //store the spots and labels in the map in a list of layers
 let parkingSquares = [];
@@ -54,7 +59,7 @@ async function renderSpots() {
     //and green for empty spots that cannot be reserved.
     spots.forEach(spot => {
       const { x: latitude, y: longitude, spotCode, spotsID, boundaries, status, spotColor, spotLabel, isReservable, locationDescription } = spot;
-            console.log(`Spot ${spotCode} has status: ${status}`);
+      console.log(`Spot ${spotCode} has status: ${status}`);
       const [centerLatitude, centerLongitude] = spotLabel;
 
       //this is the rectangle properties that represents visually the parking spot on the map
@@ -77,45 +82,55 @@ async function renderSpots() {
       }).addTo(map);
       spotLabels.push(label);
 
-      //to help organize the spot on the map
-      const dragSpot = L.marker([latitude, longitude], {
-        draggable: true,
-        opacity: 0,
-        interactive: false,
-      }).addTo(map);
-      dragSpots.push(dragSpot);
+      if (isAdmin) {
+        //to help organize the spot on the map
+        const dragSpot = L.marker([latitude, longitude], {
+          draggable: true,
+          opacity: 0,
+          interactive: false,
+        }).addTo(map);
+        dragSpots.push(dragSpot);
 
-      //update the rectangle boundaries when the marker is dragged
-      dragSpot.on('drag', event => {
-        const newCoordinates = event.target.getLatLng();
-        const newBoundaries = [
-          [newCoordinates.lat, newCoordinates.lng],
-          [newCoordinates.lat + deltaLatitude, newCoordinates.lng + deltaLongitude]
-        ];
-        spotRectangle.setBounds(newBoundaries);
-      });
+        //update the rectangle boundaries when the marker is dragged
+        dragSpot.on('drag', event => {
+          const newCoordinates = event.target.getLatLng();
+          const newBoundaries = [
+            [newCoordinates.lat, newCoordinates.lng],
+            [newCoordinates.lat + deltaLatitude, newCoordinates.lng + deltaLongitude]
+          ];
+          spotRectangle.setBounds(newBoundaries);
+        });
 
-      //save on the database the new coordinates
-      dragSpot.on('dragend', async event => {
-        const newCoordinates = event.target.getLatLng();
-        try {
-          await updateSpotCoordinates(spotsID, newCoordinates.lat, newCoordinates.lng);
-          console.log(`Spot ${spotCode} updated.`);
-        } catch (error) {
-          console.error("Some error occurred while updating the spot:", error);
-        }
-      });
+        //save on the database the new coordinates
+        dragSpot.on('dragend', async event => {
+          const newCoordinates = event.target.getLatLng();
+          try {
+            await updateSpotCoordinates(spotsID, newCoordinates.lat, newCoordinates.lng);
+            console.log(`Spot ${spotCode} updated.`);
+          } catch (error) {
+            console.error("Some error occurred while updating the spot:", error);
+          }
+        });
+      }
 
       //popup with the spot information
-      spotRectangle.bindPopup(`
+      let popupHtml = `
         <div class="spot-popup">
         <strong>${spotCode}</strong><br>
         Status: ${status}<br>
-        Reservable: ${(isReservable === true) ? 'Yes' : 'No'}<br>
-        <button class="checkin-btn" data-code="${spotCode}">Check-In</button>
-        <button class="checkout-btn" data-code="${spotCode}">Check-Out</button>
-      </div>
-      `);
+        Reservable: ${isReservable ? 'Yes' : 'No'}<br>
+      `;
+
+      if (!isAdmin) {
+        popupHtml += `
+          <button class="checkin-btn" data-code="${spotCode}">Check-In</button>
+          <button class="checkout-btn" data-code="${spotCode}">Check-Out</button>
+      `;
+      }
+
+      popupHtml += `</div>`;
+
+      spotRectangle.bindPopup(popupHtml);
       spotRectangle.on('click', function (event) {
         spotRectangle.openPopup(event.latlng);
       });
@@ -156,75 +171,82 @@ document.addEventListener("DOMContentLoaded", () => {
 setInterval(renderSpots, refreshInterval);
 
 //function to get the closest empty spot
-document.getElementById('routeBtn').addEventListener('click', async () => {
-  if (showRoute && currentRoute) {
-    map.removeControl(currentRoute);
-    showRoute = false;
-    currentRoute = null;
-    return;
-  }
-  if (userLatitude && userLongitude)
-    try {
-      const closestSpot = await getClosestSpot(userLatitude, userLongitude);
-      //remove the previous route if it exists to create a new one
-      if (currentRoute) {
-        map.removeControl(currentRoute);
-      }
-      currentRoute = L.Routing.control({
-        show: false,
-        addWaypoints: [false],
-        draggableWaypoints: false,
-        routeWhileDragging: false,
-        waypoints: [
-          L.latLng(userLatitude, userLongitude),
-          L.latLng(closestSpot.x, closestSpot.y)
-        ],
-        lineOptions: {
-          styles: [{ color: 'purple', opacity: 0.5, weight: 3 }]
-        },
-        createPointer: () => null
-      }).addTo(map);
-      L.circleMarker([closestSpot.x, closestSpot.y], {
-        radius: 6,
-        color: 'purple',
-        fillColor: 'purple',
-        fillOpacity: 0.7
-      }).addTo(map).bindPopup("Closest empty spot");
-      showRoute = true;
-      currentRoute.on('routesfound', (event) => {
-        directions = event.routes[0].instructions;
-        currentDirectionIndex = 0;
-        if (directions.length > 0) {
-          const instr = directions[0];
-          document.getElementById('routeInstructions').innerText = instr.text;
-          speakInstruction(instr.text);
-        }
-      });
-
-      navigator.geolocation.watchPosition(position => {
-        const currentLatitude = position.coords.latitude;
-        const currentLongitude = position.coords.longitude;
-
-        if (directions.length === 0 || currentDirectionIndex >= directions.length) return;
-
-        const currentInstr = directions[currentDirectionIndex];
-        const instrLatitude = currentInstr.latLng.lat;
-        const instrLongitude = currentInstr.latLng.lng;
-
-        const distance = map.distance(
-          L.latLng(currentLatitude, currentLongitude),
-          L.latLng(instrLatitude, instrLongitude)
-        );
-
-        if (distance < 10) {
-          speakDirection(currentInstr.text);
-          currentDirectionIndex++;
-          const instrDiv = document.getElementById('routeInstructions');
-          if (instrDiv) instrDiv.innerText = currentInstr.text;
-        }
-      });
-    } catch (error) {
-      console.error("Some error occurred while trying to trace the route:", error);
-      alert("Error finding the closest spot.");
+if (!isAdmin) {
+  document.getElementById('routeBtn').addEventListener('click', async () => {
+    if (showRoute && currentRoute) {
+      map.removeControl(currentRoute);
+      showRoute = false;
+      currentRoute = null;
+      return;
     }
-});
+    if (userLatitude && userLongitude)
+      try {
+        const closestSpot = await getClosestSpot(userLatitude, userLongitude);
+        //remove the previous route if it exists to create a new one
+        if (currentRoute) {
+          map.removeControl(currentRoute);
+        }
+        currentRoute = L.Routing.control({
+          show: false,
+          addWaypoints: [false],
+          draggableWaypoints: false,
+          routeWhileDragging: false,
+          waypoints: [
+            L.latLng(userLatitude, userLongitude),
+            L.latLng(closestSpot.x, closestSpot.y)
+          ],
+          lineOptions: {
+            styles: [{ color: 'purple', opacity: 0.5, weight: 3 }]
+          },
+          createPointer: () => null
+        }).addTo(map);
+        L.circleMarker([closestSpot.x, closestSpot.y], {
+          radius: 6,
+          color: 'purple',
+          fillColor: 'purple',
+          fillOpacity: 0.7
+        }).addTo(map).bindPopup("Closest empty spot");
+        showRoute = true;
+        currentRoute.on('routesfound', (event) => {
+          directions = event.routes[0].instructions;
+          currentDirectionIndex = 0;
+          if (directions.length > 0) {
+            const instr = directions[0];
+            document.getElementById('routeInstructions').innerText = instr.text;
+            speakInstruction(instr.text);
+          }
+        });
+
+        navigator.geolocation.watchPosition(position => {
+          const currentLatitude = position.coords.latitude;
+          const currentLongitude = position.coords.longitude;
+
+          if (directions.length === 0 || currentDirectionIndex >= directions.length) return;
+
+          const currentInstr = directions[currentDirectionIndex];
+          const instrLatitude = currentInstr.latLng.lat;
+          const instrLongitude = currentInstr.latLng.lng;
+
+          const distance = map.distance(
+            L.latLng(currentLatitude, currentLongitude),
+            L.latLng(instrLatitude, instrLongitude)
+          );
+
+          if (distance < 10) {
+            speakDirection(currentInstr.text);
+            currentDirectionIndex++;
+            const instrDiv = document.getElementById('routeInstructions');
+            if (instrDiv) instrDiv.innerText = currentInstr.text;
+          }
+        });
+      } catch (error) {
+        console.error("Some error occurred while trying to trace the route:", error);
+        alert("Error finding the closest spot.");
+      }
+  });
+} else {
+  const routeBtn = document.getElementById('routeBtn');
+  if (routeBtn) {
+    routeBtn.style.display = 'none';
+  }
+}
