@@ -127,7 +127,7 @@ public class SpotsService {
                 (spot.getX() + (spot.getX() + deltaLatitude)) / 2,
                 (spot.getY() + (spot.getY() + deltaLongitude)) / 2);
 
-        return new SpotsDTO(spot.getSpotCode(), spot.getStatus(), spot.getLocationDescription(), spotColor,
+        return new SpotsDTO(spot.getSpotCode(), spot.getSpotsID(), spot.getStatus(), spot.getLocationDescription(), spotColor,
                 spot.getX(), spot.getY(), spot.getIsReservable(), boundaries, spotLabel);
     }
 

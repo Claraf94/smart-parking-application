@@ -7,6 +7,7 @@ import com.smartparking.enums.SpotStatus;
 public class SpotsDTO {
     //declare variables
     private String spotCode, locationDescription, spotColor;
+    private int spotsID;
     private SpotStatus status;
     private Double x, y;
     private Boolean isReservable;
@@ -14,9 +15,10 @@ public class SpotsDTO {
     private List<Double> spotLabel;
 
     // Constructor
-    public SpotsDTO(String spotCode, SpotStatus status, String locationDescription, String spotColor, Double x, Double y,
+    public SpotsDTO(String spotCode, int spotsID, SpotStatus status, String locationDescription, String spotColor, Double x, Double y,
                    Boolean isReservable, List<List<Double>> boundaries, List<Double> spotLabel) {
         this.spotCode = spotCode;
+        this.spotsID = spotsID;
         this.status = status;
         this.locationDescription = locationDescription;
         this.spotColor = spotColor;
@@ -37,6 +39,14 @@ public class SpotsDTO {
 
     public void setSpotCode(String spotCode) {
         this.spotCode = spotCode;
+    }
+
+    public int getSpotsID() {
+        return spotsID;
+    }
+
+    public void setSpotsID(int spotsID) {
+        this.spotsID = spotsID;
     }
 
     public SpotStatus getStatus() {
@@ -106,6 +116,7 @@ public class SpotsDTO {
     @Override
     public String toString() {
         return "SpotCode: " + spotCode +  "\n" +
+                "SpotsID: " + spotsID +  "\n" +
                 "Status: " + status +  "\n" +
                 "LocationDescription: " + locationDescription +  "\n" +
                 "SpotColor: " + spotColor +  "\n" +

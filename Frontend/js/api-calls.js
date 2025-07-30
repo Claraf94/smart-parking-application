@@ -213,3 +213,33 @@ export async function getNotifications() {
     return await get('/notifications/user');
 }
 
+// --------- ADMIN FUNCTIONS ----------
+//creat a new parking spot function
+export async function createParkingSpot(spotData) {
+    try {
+        return await post('/spots/register', spotData);
+    } catch (error) {
+        console.error('Error creating parking spot:', error);
+        throw error;
+    }
+}
+
+//update spot information function
+export async function updateSpotInfo(spotId, spotData) {
+    try{
+        return await put(`/spots/update/${spotId}`, spotData);
+    }catch (error) {
+        console.error('Error updating spot information:', error);
+        throw error;
+    }
+}
+
+//delete a spot function
+export async function deleteParkingSpot(spotId) {
+    try {
+        return await del(`/spots/delete/${spotId}`);
+    } catch (error) {
+        console.error('Error deleting spot:', error);
+        throw error;
+    }
+}

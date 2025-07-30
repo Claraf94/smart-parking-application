@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartparking.dto.CoordinatesRequestDTO;
+import com.smartparking.dto.SpotUpdateDTO;
 import com.smartparking.dto.SpotsDTO;
 import com.smartparking.entity.Spots;
 import com.smartparking.enums.SpotStatus;
@@ -46,10 +47,12 @@ public class SpotsController {
     // returns all parking spots and can be filtered by its query parameter such as
     // status
     @GetMapping("")
-    public List<SpotsDTO> findSpots(@RequestParam(required = false) SpotStatus status, @RequestParam(required = false) Boolean isReservable) {
+    public List<SpotsDTO> findSpots(@RequestParam(required = false) SpotStatus status,
+            @RequestParam(required = false) Boolean isReservable) {
         List<Spots> spots;
         if (status != null && isReservable != null) {
-            spots = spotsService.findByStatusAndIsReservable(status, isReservable); // filter by both status and reservable
+            spots = spotsService.findByStatusAndIsReservable(status, isReservable); // filter by both status and
+                                                                                    // reservable
         } else if (status != null) {
             spots = spotsService.findByStatus(status); // filter by status
         } else if (isReservable != null && isReservable) {
@@ -73,7 +76,8 @@ public class SpotsController {
     // update coorinates of a parking spot
     @PreAuthorize("hasRole('ADMIN')") // only admin can update coordinates of parking spots on the system
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCoordinates(@PathVariable int id, @RequestBody CoordinatesRequestDTO coordinates) {
+    public ResponseEntity<String> updateCoordinates(@PathVariable int id,
+            @RequestBody CoordinatesRequestDTO coordinates) {
         Optional<Spots> spotOp = spotsRepository.findById(id);
 
         if (spotOp.isEmpty()) {
@@ -87,7 +91,7 @@ public class SpotsController {
 
     }
 
-    //get the closest parking spot by coordinates
+    // get the closest parking spot by coordinates
     @GetMapping("/closestSpot")
     public ResponseEntity<Spots> getClosestSpot(@RequestParam double x, @RequestParam double y) {
         Spots closestSpot = spotsService.findClosestSpot(x, y);
@@ -101,15 +105,19 @@ public class SpotsController {
     // update a parking spot
     @PreAuthorize("hasRole('ADMIN')") // only admin can update parking spots on the system
     @PutMapping("/update/{id}")
-    public ResponseEntity<Spots> updateSpot(@PathVariable int id, @RequestBody Spots spot) {
-        if (id <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-        try {
-            return ResponseEntity.ok(spotsService.updateSpot(id, spot));
-        } catch (Exception e) {
+    public ResponseEntity<Spots> updateSpot(@PathVariable int id, @RequestBody SpotUpdateDTO updateDTO) {
+        Optional<Spots> spotSpot = spotsService.findById(id);
+
+        if (spotSpot.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
+        Spots spot = spotSpot.get();
+        spot.setStatus(updateDTO.getStatus());
+        spot.setIsReservable(updateDTO.getIsReservable());
+        spot.setLocationDescription(updateDTO.getLocationDescription());
+
+        return ResponseEntity.ok(spotsRepository.save(spot));
     }
 
     // delete a parking spot
