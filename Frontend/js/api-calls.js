@@ -1,5 +1,5 @@
-//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+//const API_BASE_URL = "http://localhost:8080";
 
 // ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
 //function to add authentication headers to the request
@@ -242,4 +242,41 @@ export async function deleteParkingSpot(spotId) {
         console.error('Error deleting spot:', error);
         throw error;
     }
+}
+
+//get a overview of all spots function
+export async function getSpotsOverview() {
+    const spots = await loadSpots();
+    const overall = spots.length;
+    const statusOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
+    const reservableSpotsOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
+    const regularSpotsOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
+    for(const spot of spots){
+        const status = spot.status;
+        const isReservable = spot.isReservable;
+        statusOverview[status] = (statusOverview[status] || 0) + 1;
+        if(isReservable) {
+            reservableSpotsOverview[status] = (reservableSpotsOverview[status] || 0) + 1;
+        }else{
+            regularSpotsOverview[status] = (regularSpotsOverview[status] || 0) + 1;
+        }
+    }
+    return{overall, statusOverview, reservableSpotsOverview, regularSpotsOverview};
+}
+
+//get all users function
+export async function getAllUsers() {
+    return await get('/users/findAll');
+}
+
+//get user by email function
+export async function getUserByEmail(email) {
+    const response = await get(`/users/findByEmail/${email}`);
+    return response ? Array.isArray(response) ? response : [response] : [];
+}
+
+//get users by type function
+export async function getUsersByType(userType) {
+    const response = await get(`/users/findByUserType/${userType}`);
+    return response ? Array.isArray(response) ? response : [response] : [];
 }

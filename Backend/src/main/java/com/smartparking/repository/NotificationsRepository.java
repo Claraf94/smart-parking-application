@@ -17,5 +17,5 @@ public interface NotificationsRepository extends JpaRepository<Notifications, In
     //check if a notification already exists for a user with the same message and type
     boolean existsByUserAndNotificationTypeAndTextMessage(Users user, NotificationType notificationType, String textMessage);
     //find notifications by user and type
-    List<Notifications> findByUserAndNotificationType(Users user, NotificationType notificationType);
+    List<Notifications> findByUserAndNotificationType(Users user, NotificationType notificationType);    
 }//notifications repository class

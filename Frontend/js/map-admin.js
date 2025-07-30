@@ -169,7 +169,7 @@ async function createNewParkingSpot(event) {
     event.preventDefault();
     const spotCode = document.getElementById('newSpotCode').value.trim();
     const status = document.getElementById('newSpotStatus').value;
-    const isReservable = document.getElementById('newSpotReservable').value === 'false';
+    const isReservable = document.getElementById('newSpotReservable').value === 'true';
     const locationDescription = document.getElementById('newSpotDescription').value;
 
     const spotData = {
@@ -185,6 +185,15 @@ async function createNewParkingSpot(event) {
         await createParkingSpot(spotData);
         alert('New parking spot created.');
         await renderSpots();
+
+        //clean the form fields after
+        document.getElementById('newSpotCode').value = '';
+        document.getElementById('newSpotDescription').value = '';
+        document.getElementById('newSpotStatus').selectedIndex = 0;
+        document.getElementById('newSpotReservable').selectedIndex = 0;
+        document.getElementById('newSpotLatitude').value = '';
+        document.getElementById('newSpotLongitude').value = '';
+
         const sidebarContent = document.getElementById('createSpotSidebar');
         const sidebar = bootstrap.Offcanvas.getInstance(sidebarContent);
         if (sidebar) {
