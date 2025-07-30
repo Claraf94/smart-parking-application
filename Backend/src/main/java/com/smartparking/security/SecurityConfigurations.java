@@ -58,7 +58,7 @@ public class SecurityConfigurations {
                 "http://localhost:5500",
                 "https://gray-smoke-0c9a20a03.2.azurestaticapps.net"));
         confSource.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        confSource.setAllowedHeaders(List.of("*"));
+        confSource.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         confSource.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", confSource);
