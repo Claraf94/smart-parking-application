@@ -16,8 +16,8 @@ export function getUserRoleFromToken() {
         const decodedPayload = JSON.parse(atob(payloadBase64));
         const roles = decodedPayload.roles;
         return Array.isArray(roles) ? roles[0] : roles;
-    } catch (e) {
-        console.error("Failed to parse token payload:", e);
+    } catch (error) {
+        console.error("Failed to parse token payload:", error);
         return null;
     }
 }

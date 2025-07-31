@@ -82,13 +82,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 calendar.setDate(new Date());
                 iti.setNumber("");
             } catch (error) {
-                console.error('Error creating reservation:', error);
-                alert("Reservation could not be created. Please try again.");
+                alert(error.message || "Reservation could not be created. Please try again.");
             }
         });
         await loadUserReservationHistory();
     } catch (error) {
-        console.error('Error retrieving reservable spots:', error);
+        alert('Error retrieving reservable spots: ' + (error.message || "Unknown error"));
     }
 });
 
@@ -130,8 +129,7 @@ async function loadUserReservationHistory() {
                             alert("Reservation cancelled");
                             await loadUserReservationHistory();
                         } catch (error) {
-                            console.error('Error cancelling reservation:', error);
-                            alert("Reservation could not be cancelled. Please try again.");
+                            alert(error.message || "Reservation could not be cancelled. Please try again.");
                         }
                     }
                 });

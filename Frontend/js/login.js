@@ -43,12 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } catch (error) {
-                if (error.message.includes("Email not found")) {
+                const msg = error.message || "Unknown error";
+                if (msg.includes("Email not found")) {
                     alert("This email is not registered.");
-                } else if (error.message.includes("Incorrect password")) {
+                } else if (msg.includes("Incorrect password")) {
                     alert("Incorrect password.");
                 } else {
-                    alert("Login error: " + error.message);
+                    alert("Login error: " + msg);
                 }
             }
         });
@@ -93,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Registration failed: " + response.message);
                 }
             } catch (error) {
-                console.error(error);
-                alert("Registration error: " + error.message);
+                const msg = error.message || "Unknown error";
+                alert("Registration error: " + msg);
             }
         });
     }

@@ -120,4 +120,11 @@ public class NotificationsController {
         }
         return ResponseEntity.ok(notificationsService.getNotifications(user.get()));
     }
+
+    //get all notifications 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<Notifications>> getAllNotifications() {
+        return ResponseEntity.ok(notificationsService.getAllNotifications());
+    }
 }//notifications controller class

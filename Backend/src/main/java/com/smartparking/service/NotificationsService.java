@@ -202,4 +202,9 @@ public class NotificationsService{
         //returns all notifications for a specific user
         return notificationsRepository.findByUser(user);
     }
+
+    public List<Notifications> getAllNotifications() {
+        //returns all notifications in the database
+        return notificationsRepository.findAll();
+    }
 }//notifications service class

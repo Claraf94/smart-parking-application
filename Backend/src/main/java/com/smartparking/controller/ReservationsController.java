@@ -23,7 +23,8 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/reservations")
-//this controller handles all operations related to reservations, including creating, retrieving, and deleting reservations.
+// this controller handles all operations related to reservations, including
+// creating, retrieving, and deleting reservations.
 public class ReservationsController {
     @Autowired
     private ReservationsService reservationsService;
@@ -32,14 +33,15 @@ public class ReservationsController {
     @Autowired
     private UsersService usersService;
 
-    //create a new reservations
+    // create a new reservations
     @PostMapping("/create")
     public ResponseEntity<Reservations> createReservation(@RequestBody @Valid Reservations reservation) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        Users user = usersService.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
+        Users user = usersService.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
         reservation.setUser(user);
-        if(reservation.getReservationStatus() == null){
+        if (reservation.getReservationStatus() == null) {
             reservation.setReservationStatus(ReservationStatus.ACTIVE);
         }
         System.out.println("Creating reservation: " + reservation);
@@ -47,7 +49,7 @@ public class ReservationsController {
         return ResponseEntity.ok(savedReservation);
     }
 
-    //returns reservation by user
+    // returns reservation by user
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Reservations>> getReservationsByUser(@PathVariable int userId) {
@@ -64,39 +66,46 @@ public class ReservationsController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Users user = usersService.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found."));
         return ResponseEntity.ok(reservationsService.findByUser(user));
     }
 
-    //returns reservation by spot
+    // returns reservation by spot
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/spot/{spotId}")
     public List<Reservations> getReservationsBySpot(@PathVariable int spotId) {
-        if(spotId <=0){
+        if (spotId <= 0) {
             throw new IllegalArgumentException("Invalid spot ID.");
         }
-        if(spotsService.findById(spotId).isEmpty()){
+        if (spotsService.findById(spotId).isEmpty()) {
             throw new IllegalArgumentException("Spot not found.");
         }
         return reservationsService.findBySpot(spotsService.findById(spotId).get());
     }
 
-    //returns reservation by status
+    // returns reservation by status
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/status/{status}")
     public List<Reservations> getReservationsByStatus(@PathVariable String status) {
-        try{
+        try {
             ReservationStatus enumStatus = ReservationStatus.valueOf(status.toUpperCase());
             return reservationsService.findByReservationStatus(enumStatus);
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid status.");
         }
     }
 
-    //delete a reservation by ID
-    @PutMapping(value = "/cancel/{reservationId}", consumes = "application/json") 
+    // cancel a reservation by ID
+    @PutMapping(value = "/cancel/{reservationId}", consumes = "application/json")
     public ResponseEntity<Void> deleteReservation(@PathVariable int reservationId) {
         reservationsService.cancelReservation(reservationId);
         return ResponseEntity.noContent().build();
     }
-}//reservations controller class
+
+    // get all reservations history
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public List<Reservations> getAllReservations() {
+        return reservationsService.findAll();
+    }
+}// reservations controller class

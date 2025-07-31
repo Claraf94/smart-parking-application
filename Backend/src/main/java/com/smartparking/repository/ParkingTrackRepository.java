@@ -31,4 +31,8 @@ public interface ParkingTrackRepository extends JpaRepository<ParkingTrack, Inte
     boolean existsByUserAndConfirmCheckInTrueAndCheckOutIsNull(Users user);
     //checking if a spot has been checked out not to allow double check outs
     Optional<ParkingTrack> findByUserAndSpotAndConfirmCheckInTrueAndCheckOutIsNull(Users user, Spots spot);
-}//parking track repository class
+    //finds all parking tracks where check in is confirmed and check out is not confirmed
+    List<ParkingTrack> findByConfirmCheckInTrueAndConfirmCheckOutFalse();
+    //finds all parking tracks where check in is confirmed and check out is not confirmed for a specific user to avoid double check ins
+    Optional<ParkingTrack> findByUserAndConfirmCheckInTrueAndConfirmCheckOutFalse(Users user);
+}

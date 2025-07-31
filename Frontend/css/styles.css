@@ -12767,7 +12767,7 @@ hr.divider-light {
 }
 
 header.masthead {
-  padding-top: 4rem;
+  padding-top: 10rem;
   padding-bottom: 2rem;
   min-height: 25rem;
   background: linear-gradient(to bottom, rgba(230, 230, 230, 0.8) 0%, rgba(230, 230, 230, 0.8) 100%), url("../assets/img/bg-masthead.jpg");
@@ -13432,6 +13432,9 @@ button[type="submit"]:hover {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 16px;
 }
 
 .notification-card:hover {
@@ -13749,4 +13752,195 @@ body.check-users-information {
 .table thead th:last-child {
   border-top-right-radius: 10px;
   overflow: hidden;
+}
+
+#adminTab {
+  margin-top: 70px;
+}
+
+.nav-tabs {
+  border-bottom: 2px solid #e0e0e0;
+  justify-content: center;
+  display: flex;
+}
+
+.nav-tabs .nav-link {
+  background-color: #b28cd9;
+  color: white;
+  margin: 0 5px;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #a47dca;
+  color: white;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #8e6bb8;
+  color: white;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.tab-content {
+  background: #fff;
+  border-radius: 10px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  margin-top: 30px;
+}
+
+.tab-card {
+  border: 1px solid #e0e0e0;
+  border-left: 5px solid #b28cd9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  background-color: #fafafa;
+  transition: box-shadow 0.3s ease;
+}
+
+.tab-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tab-card h6 {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tab-card p {
+  margin: 0;
+  color: #555;
+}
+
+.tab-pane {
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 30px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 15px;
+}
+}
+
+.tab-pane .btn-map-view,
+.tab-pane .btn {
+  margin-top: 20px;
+}
+
+.tab-pane .btn-primary-custom {
+  background-color: #b28cd9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin-top: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.btn-map-view {
+  background-color: #b28cd9;
+  display: inline-block;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top:10px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-map-view:hover {
+  transform: translateY(-4px);
+  color: white;
+  background-color: #a47dca;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 1005px) and (min-width: 577px) {
+  .nav-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-tabs .nav-item {
+    flex: 0 0 calc(50% - 12px);
+    text-align: center;
+  }
+
+  .nav-tabs .nav-link {
+    width: 100%;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 780px) {
+  .nav-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-tabs .nav-item {
+    flex: 0 0 calc(50% - 12px);
+    text-align: center;
+  }
+
+  .nav-tabs .nav-link {
+    width: 100%;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .blur-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100vw;
+    background-color: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 20px;
+    z-index: 1050;
+  }
+
+  .blur-menu .nav-link {
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    padding-left: 40px !important;
+  }
+
+  .blur-menu .nav-link:hover {
+    color: #b28cd9;
+  }
+}
+
+.message-box {
+  background-color: white;
+  border-left: 5px solid #b28cd9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
+.message-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
 }

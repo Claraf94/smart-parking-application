@@ -158,4 +158,9 @@ public class ReservationsService {
         }
 
     }
+
+    // find all reservations
+    public List<Reservations> findAll() {
+        return reservationsRepository.findAll();
+    }
 }// reservations service class

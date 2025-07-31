@@ -31,7 +31,6 @@
             </div>
         </div>
     </nav>
-
     <!-- Main section -->
     <!-- Dashboard section -->
     <main class="main-dashboard mt-5 py-5 flex-grow-1">
@@ -68,6 +67,142 @@
                     </div>
                 </div>
             </div>
+            <!-- Tabs for Administrator Management -->
+            <ul class="nav nav-tabs mb-3" id="adminTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="current-tab" data-bs-toggle="tab" data-bs-target="#current"
+                        type="button" role="tab">Parked Now</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history"
+                        type="button" role="tab">Parking History</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reservations-tab" data-bs-toggle="tab" data-bs-target="#reservations"
+                        type="button" role="tab">Reservation History</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications"
+                        type="button" role="tab">Notifications History</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="fines-tab" data-bs-toggle="tab" data-bs-target="#fines" type="button"
+                        role="tab">Fines</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="adminTabContent">
+                <div class="tab-pane fade show active" id="current" role="tabpanel">
+                    <div id="currentParkedList"></div>
+                    <a href="admin-spot-management.html" class="btn-map-view"><i class="bi bi-map"></i> Go to Map</a>
+                </div>
+                <div class="tab-pane fade" id="history" role="tabpanel">
+                    <div class="filter-section mb-3">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-6">
+                                <label for="userFilterParking" class="form-label">Filter by User</label>
+                                <select id="userFilterParking" class="form-select">
+                                    <option value="">All Users</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="spotFilterParking" class="form-label">Filter by Spot</label>
+                                <select id="spotFilterParking" class="form-select">
+                                    <option value="">All Spots</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="applyParkingFilterBtn" class="btn btn-primary mt-3">Apply Filters</button>
+                    </div>
+                    <div id="parkingHistoryList"></div>
+                </div>
+                <div class="tab-pane fade" id="reservations" role="tabpanel">
+                    <div class="filter-section mb-3">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <label for="userFilterReservation" class="form-label">Filter by User</label>
+                                <select id="userFilterReservation" class="form-select">
+                                    <option value="">All Users</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="spotFilterReservation" class="form-label">Filter by Spot</label>
+                                <select id="spotFilterReservation" class="form-select">
+                                    <option value="">All Spots</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="statusFilterReservation" class="form-label">Filter by Status</label>
+                                <select id="statusFilterReservation" class="form-select">
+                                    <option value="">All Statuses</option>
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="FINISHED">Finished</option>
+                                    <option value="EXPIRED">Expired</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="applyReservationFilterBtn" class="btn btn-primary mt-3">Apply Filters</button>
+                    </div>
+                    <div id="reservationsList"></div>
+                </div>
+                <div class="tab-pane fade" id="notifications" role="tabpanel">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal"
+                        data-bs-target="#createNotificationModal">Create New Notification</button>
+                    <div id="notificationList"></div>
+                    <div class="modal fade" id="createNotificationModal" tabindex="-1"
+                        aria-labelledby="createNotificationLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form id="createNotificationForm">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="createNotificationLabel">Create New Notification
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="notificationUserId" class="form-label">User</label>
+                                            <select id="notificationUserSelect" class="form-select">
+                                                <option value="">All Users</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="notificationType" class="form-label">Notification Type</label>
+                                            <select id="notificationType" class="form-select" required>
+                                                <option value="GENERAL_INFORMATION">General Information</option>
+                                                <option value="FINE_APPLIED">Fine Applied</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="notificationMessage" class="form-label">Message</label>
+                                            <textarea class="form-control" id="notificationMessage" rows="3"
+                                                required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Create Notification</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="fines" role="tabpanel" aria-labelledby="fines-tab">
+                    <div class="filter-section mb-3">
+                        <label for="fineFilter" class="form-label">Filter by status</label>
+                        <select id="fineFilter" class="form-select">
+                            <option value="">All Fines</option>
+                            <option value="unpaid">Unpaid</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                        <button id="applyFineFilterBtn" class="btn btn-primary mt-2">Apply Filter</button>
+                    </div>
+                    <div id="finesList"></div>
+                </div>
+            </div>
         </div>
     </main>
     <!-- Footer -->
@@ -80,8 +215,8 @@
                     <div class="email-address">parkingapplication@gmail.com</div>
                 </div>
             </div>
-            <dixv class="text-center small text-muted">Copyright &copy; 2025 - ParkTime
-        </div>
+            <div class="text-center small text-muted">Copyright &copy; 2025 - ParkTime
+            </div>
         </div>
     </footer>
     <!-- Bootstrap core JS-->

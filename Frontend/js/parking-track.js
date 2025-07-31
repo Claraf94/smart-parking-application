@@ -9,7 +9,7 @@ document.addEventListener('click', async (event) => {
             alert(`Check-in done at spot ${spotCode}.`);
             location.reload(); // Reload the page to reflect the current parking status
         } catch (error) {
-            alert(`Something went wrong during check-in: ${error.response?.data || error.message}`);
+            alert(`Something went wrong during check-in: ${error.message}`);
         }
     }
     if(event.target.classList.contains("checkout-btn")) {
@@ -19,7 +19,7 @@ document.addEventListener('click', async (event) => {
             alert(`Check-out done at spot ${spotCode}.`);
             location.reload(); // Reload the page to reflect the current parking status
         } catch (error) {
-            alert(`Something went wrong during check-out: ${error.response?.data || error.message}`);
+            alert(`Something went wrong during check-out: ${error.message}`);
         }
     }
 });

@@ -1,5 +1,5 @@
-const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-//const API_BASE_URL = "http://localhost:8080";
+//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+const API_BASE_URL = "http://localhost:8080";
 
 // ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
 //function to add authentication headers to the request
@@ -279,4 +279,34 @@ export async function getUserByEmail(email) {
 export async function getUsersByType(userType) {
     const response = await get(`/users/findByUserType/${userType}`);
     return response ? Array.isArray(response) ? response : [response] : [];
+}
+
+//get current parked users function
+export async function getCurrentParkedUsers() {
+    return await get('/parkingTrack/checked-in');
+}
+
+//get parking track history function
+export async function getParkingTrackHistory() {
+    return await get('/parkingTrack/all');
+}
+
+//get all reservations function
+export async function getAllReservations() {
+    return await get('/reservations/all');
+}
+
+//get all notifications function
+export async function getAllNotifications() {
+    return await get('/notifications/all');
+}
+
+//get unpaid fines function
+export async function getUnpaidFines() {
+    return await get('/notifications/unpaid-fines');
+}
+
+//mark fine as paid function
+export async function payFine(notificationID) {
+    return await put(`/notifications/${notificationID}/pay`);
 }

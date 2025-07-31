@@ -73,7 +73,7 @@ public class SpotsController {
         return spotsService.findBySpotCode(spotCode).orElse(null);
     }
 
-    // update coorinates of a parking spot
+    // update coordinates of a parking spot
     @PreAuthorize("hasRole('ADMIN')") // only admin can update coordinates of parking spots on the system
     @PutMapping("/{id}")
     public ResponseEntity<String> updateCoordinates(@PathVariable int id,
