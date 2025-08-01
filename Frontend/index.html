@@ -29,8 +29,8 @@
                 aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                    <li class="nav-item"><a class="nav-link active"href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact Us</a></li>
                     <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
                 </ul>
             </div>
@@ -39,25 +39,27 @@
     <!-- Main section -->
     <!-- Welcome section-->
     <main>
-    <header class="masthead">
-        <div class="container px-4 px-lg-5 h-100">
-            <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
-                <div class="col-lg-8 align-self-end">
-                    <div class="mb-3">
-                        <i class="fas fa-map-location-dot fa-3x icon bounce-hover"></i>
+        <header class="masthead">
+            <div class="container px-4 px-lg-5 h-100">
+                <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
+                    <div class="col-lg-8 align-self-end">
+                        <div class="mb-3">
+                            <i class="fas fa-map-location-dot fa-3x icon bounce-hover"></i>
+                        </div>
+                        <h1 class="font-weight-bold">Welcome to ParkTime Platform</h1>
+                        <hr class="divider" style="background-color: transparent;" />
                     </div>
-                    <h1 class="font-weight-bold">Welcome to ParkTime Platform</h1>
-                    <hr class="divider" style="background-color: transparent;" />
-                </div>
-                <div class="col-lg-8 align-self-baseline">
-                    <p class="mb-5">Manage your time effectively with visualized parking space availability and booking
-                        management. Optimize your parking experience with this intuitive system and real-time updates.
-                    </p>
-                    <a class="start-button btn btn-primary btn-lg" href="login.html">Get Started</a>
+                    <div class="col-lg-8 align-self-baseline">
+                        <p class="mb-5">Manage your time effectively with visualized parking space availability and
+                            booking
+                            management. Optimize your parking experience with this intuitive system and real-time
+                            updates.
+                        </p>
+                        <a class="start-button btn btn-primary btn-lg" href="login.html">Get Started</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
     </main>
     <!-- Services section-->
     <section class="page-section" id="services">
@@ -99,6 +101,44 @@
             </div>
         </div>
     </section>
+    <!-- Contact form section -->
+    <section class="page-section" id="contact">
+        <div class="container px-4 px-lg-5">
+            <h2 class="text-center mt-0">Contact Us</h2>
+            <p class="text-center mb-3 text-muted">
+                If you have any questions or need more information, please fill out the form below and we’ll get back
+                to you.
+            </p>
+            <hr class="divider" />
+            <div class="contact-form-container mx-auto" style="max-width:600px; margin-top:1rem;">
+                <form id="contactForm" action="https://formspree.io/f/movlnazp" method="POST" novalidate>
+                    <input type="hidden" name="_next" value="/thank-you.html" />
+                    <div class="form-group mb-3">
+                        <label for="name">Name<span aria-hidden="true"></span></label>
+                        <input type="text" name="name" id="name" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="email">Email<span aria-hidden="true"></span></label>
+                        <input type="email" name="_replyto" id="email" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="subject">Subject<span aria-hidden="true"></span></label>
+                        <input type="text" name="subject" id="subject" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="message">Message<span aria-hidden="true"></span></label>
+                        <textarea name="message" id="message" rows="5" class="form-control" required></textarea>
+                    </div>
+                    <div style="display:none;">
+                        <input type="text" name="_gotcha" />
+                    </div>
+
+                    <button type="submit" id="submitButton" class="btn btn-primary">Send Message</button>
+                    <div id="feedbackMessage" aria-live="polite" style="margin-top:8px;"></div>
+                </form>
+            </div>
+        </div>
+    </section>
     <!-- Footer-->
     <footer class="bg-light py-3">
         <div class="container px-4 px-lg-5">
@@ -106,7 +146,7 @@
                 <div class="col-lg-4 text-center mb-4">
                     <i class="bi-phone fs-2 mb-3 text-muted"></i>
                     <div class="phone-number">+353 (083) 123-4567</div>
-                    <div class="email-address">parkingapplication@gmail.com</div>
+                    <div class="email-address">parkingapplication25@gmail.com</div>
                 </div>
             </div>
             <div class="text-center small text-muted">Copyright &copy; 2025 - ParkTime</div>
@@ -118,6 +158,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
     <!-- Core theme JS-->
     <script src="js/scripts.js"></script>
+    <script type="module" src="js/contact-form.js"></script>
 </body>
 
 </html>

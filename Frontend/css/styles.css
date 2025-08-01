@@ -12622,6 +12622,7 @@ fieldset:disabled .btn {
 html {
   height: 100%;
   scroll-padding-top: calc(4.5rem - 1px);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -13967,20 +13968,27 @@ body.check-users-information {
 }
 
 .informational {
+  position: fixed;
+  top: 28%;
+  right: 10px;
+  transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 10px 14px;
+  padding: 8px 10px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   font-size: 12px;
   line-height: 1.2;
   max-width: 260px;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   gap: 6px;
   background-clip: padding-box;
   z-index: 1000;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .informational label {
@@ -14002,9 +14010,8 @@ body.check-users-information {
 @media (max-width: 768px) {
   .informational {
     font-size: 10px;
-    padding: 6px 8px;
-    max-width: 160px;
-    right: 6px;
+    padding: 4px 6px;
+    max-width: 140px;
     gap: 4px;
   }
 
@@ -14028,4 +14035,57 @@ body.check-users-information {
     text-overflow: ellipsis;
     flex: 1;
   }
+}
+
+.thank-you-page {
+  padding-top: 70px;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-thankyou {
+  flex: 1;
+  padding: 40px 20px;
+}
+
+.thankyou-card {
+  background: #f5f5f5;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.thankyou-card .icon-wrapper {
+  font-size: 60px;
+  color: #b28cd9;
+  margin-bottom: 0.5rem;
+}
+
+.thankyou-card h1 {
+  margin-top: 0;
+  font-weight: 700;
+  color: #4a2971;
+}
+
+.thankyou-card p {
+  margin: 1rem 0 1.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.thankyou-card .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.small-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #666;
 }

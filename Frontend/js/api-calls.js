@@ -368,3 +368,34 @@ export async function createFineNotification(user) {
     return await post('/notifications/fine', user);
 }
 
+
+// --------- CONTACT FORM FUNCTION
+export async function submitContactForm({ name, email, subject, message } = {}, {
+    endpoint = "https://formspree.io/f/movlnazp",
+
+} = {}) {
+    if (!name || !email || !subject || !message) {
+        throw new Error("All fields are required.");
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('_replyto', email);
+    formData.append('subject', subject);
+    formData.append('message', message);
+    formData.append('_gotcha', '');//to prevent spam bots
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            Accept: 'application/json'
+        }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        const errMsg = payload.error || (payload.errors ? payload.errors.map(e => e.message).join(', ') : null) || 'Contact form submission failed.';
+        throw new Error(errMsg);
+    }
+    return payload;
+}
