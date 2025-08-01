@@ -44,6 +44,9 @@ public class ParkingTrackService {
         Spots spotSpot = spot.get();
         // if it is a reservable spot, only allows checkin if the user has an active
         // reservation
+        if (spotSpot.getStatus() == SpotStatus.MAINTENANCE) {
+            throw new IllegalArgumentException("This spot is currently under maintenance and cannot be checked in.");
+        }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Users> userUser = usersService.findByEmail(username);
         if (userUser.isEmpty()) {
@@ -123,7 +126,8 @@ public class ParkingTrackService {
         Optional<ParkingTrack> trackCheckOut = parkingTrackRepository
                 .findBySpotAndConfirmCheckInTrueAndCheckOutIsNull(spotSpot);
         if (trackCheckOut.isEmpty()) {
-            return false;
+            throw new IllegalArgumentException(
+                    "You do not have any check in record for this spot. Because of that, you cannot check out.");
         }
         // retrieving the authenticated user that did the check in
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -49,47 +49,35 @@ public class ReservationsService {
             throw new IllegalArgumentException("Invalid spot code.");
         }
         LocalDateTime newStartTime = reservation.getStartTime();
-        LocalDateTime endTime = newStartTime.plusHours(4);
+        LocalDateTime proposedEndTime = newStartTime.plusHours(4);
         // verifies if there is an active reservation at the spot that conflicts with a
         // new one
         List<Reservations> activeReservations = reservationsRepository
                 .findBySpotAndReservationStatus(existingSpot.get(), ReservationStatus.ACTIVE);
-        Reservations nextRes = null;
         for (Reservations res : activeReservations) {
             LocalDateTime resStart = res.getStartTime();
             LocalDateTime resEnd = resStart.plusHours(4);
             // checking if overlaps with an exiting one
-            boolean conflicts = !endTime.isBefore(resStart) && !newStartTime.isAfter(resEnd);
-            if (conflicts) {
-                if (resStart.isAfter(newStartTime)) {
-                    if (nextRes == null || resStart.isBefore(nextRes.getStartTime())) {
-                        nextRes = res;
-                    }
-                } else {
-                    throw new IllegalArgumentException(
-                            "The reservation could not be completed because the time conflicts with an existing one.");
-
-                }
+            boolean overlaps = newStartTime.isBefore(resEnd) && resStart.isBefore(proposedEndTime);
+            if (!overlaps) {
+                continue;
             }
-        }
-        // shorten the duration in case another one is scheduled soon after
-        if (nextRes != null) {
-            LocalDateTime nextStarTime = nextRes.getStartTime();
-            if (endTime.isAfter(nextStarTime)) {
-                endTime = nextStarTime;
-                long durationMin = Duration.between(newStartTime, endTime).toMinutes();
+
+            if (resStart.isAfter(newStartTime)) {
+                proposedEndTime = resStart;
+                long durationMin = Duration.between(newStartTime, proposedEndTime).toMinutes();
                 // if the duration is less than 45 minutes, the system will not allow the
-                // reservation
                 if (durationMin < 45) {
                     throw new IllegalArgumentException(
                             "The reservation could not be completed because there is no enough time before the next one.");
                 }
-                System.out
-                        .println("NOTE: The spot must be released before the next reservation time at " + nextStarTime);
+                continue;
             }
+            throw new IllegalArgumentException(
+                    "The reservation could not be completed because the time conflicts with an existing one.");
         }
         // if the reservation does not conflict, save it
-        reservation.setEndTime(endTime);
+        reservation.setEndTime(proposedEndTime);
         reservation.setSpot(existingSpot.get());
         reservation.setReservationStatus(ReservationStatus.ACTIVE);
         Reservations saveReservation = reservationsRepository.save(reservation);
@@ -107,7 +95,8 @@ public class ReservationsService {
         Users user = saveReservation.getUser();
         if (user != null) {
             notificationsService.createNotificationForUser(user, NotificationType.SPOT_RESERVED,
-                    "Reservation successfully created.", saveReservation);
+                    "Reservation successfully created. Your reservation has a duration of 4 hours after the start time.",
+                    saveReservation);
         }
         spotsService.updateSpotStatus(existingSpot.get(), SpotStatus.RESERVED);
         return saveReservation;
@@ -133,11 +122,11 @@ public class ReservationsService {
     }
 
     public void cancelReservation(int reservationID) {
-        if (!reservationsRepository.existsById(reservationID)) {
-            throw new IllegalArgumentException("Reservation not found.");
+        Reservations res = reservationsRepository.findById(reservationID)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found."));
+        if (res.getReservationStatus() == ReservationStatus.CANCELLED) {
+            return;
         }
-        // cancel a reservation by ID
-        Reservations res = reservationsRepository.findById(reservationID).get();
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(res.getStartTime())) {
             throw new IllegalArgumentException("The reservation cannot be cancelled after the start time.");
@@ -147,8 +136,11 @@ public class ReservationsService {
 
         Users user = res.getUser();
         if (user != null) {
-            notificationsService.createNotificationForUser(user, NotificationType.RESERVATION_CANCELLED,
-                    "The reservation was cancelled succesfully.");
+            notificationsService.createNotificationForUser(
+                    user,
+                    NotificationType.RESERVATION_CANCELLED,
+                    "Your reservation has been cancelled.",
+                    res);
         }
         List<Reservations> activeReservations = reservationsRepository.findBySpotAndReservationStatus(
                 res.getSpot(), ReservationStatus.ACTIVE);

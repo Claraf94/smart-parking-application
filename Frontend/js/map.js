@@ -24,6 +24,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data © OpenStreetMap contributors'
 }).addTo(map);
 
+const statusLabel = [{ name: 'Reserved', color: 'orange', key: 'RESERVED' },
+{ name: 'Maintenance', color: 'yellow', key: 'MAINTENANCE' },
+{ name: 'Occupied', color: 'red', key: 'OCCUPIED' },
+{ name: 'Reservable (empty)', color: 'purple', key: 'RESERVABLE_EMPTY' },
+{ name: 'Empty (non-reservable)', color: 'green', key: 'EMPTY' },
+];
+
+const legend = L.control({ position: 'bottomright' });
+
 //store the spots and labels in the map in a list of layers
 let parkingSquares = [];
 let spotLabels = [];
@@ -36,6 +45,18 @@ let directions = [];
 let currentDirectionIndex = 0;
 let watchId = null;
 
+legend.onAdd = function () {
+  const div = L.DomUtil.create('div', 'informational');
+  div.innerHTML = `<strong>Parking Informational Labels</strong><br/>` +
+    statusLabel.map(status => `
+      <label>
+        <span class="color-box" style="background:${status.color}"></span>
+        <span style="flex:1;">${status.name}</span><br>
+      </label>
+    `).join('');
+  return div;
+};
+legend.addTo(map);
 
 async function renderSpots() {
   try {
@@ -69,7 +90,7 @@ async function renderSpots() {
       parkingSquares.push(spotRectangle);
 
       const invisibleArea = L.circle([latitude, longitude], {
-        radius:5,
+        radius: 5,
         fillOpacity: 0,
         opacity: 0,
         interactive: true
@@ -137,6 +158,35 @@ document.addEventListener("DOMContentLoaded", () => {
 //this will refresh the parking spots every 10 seconds
 setInterval(renderSpots, refreshInterval);
 
+//function to speak the instruction text
+let audioUnlock = false;
+function unlockInstruction() {
+  if (audioUnlock) return;
+  try {
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  } catch (error) {
+    console.warn('Something went wrong:', error);
+  }
+  audioUnlock = true;
+}
+
+//this will unlock the instruction when the user clicks on the map
+document.addEventListener('click', () => {
+  unlockInstruction();
+}, { once: true });
+
+window.speechSynthesis.onvoiceschanged = () => {
+  window.speechSynthesis.getVoices();
+};
+
+function speakInstructionSafe(text) {
+  if (!text) return;
+  if (!audioUnlock) unlockInstruction();
+  window.speechSynthesis.cancel();
+  speakInstruction(text);
+}
+
+
 //function to get the closest empty spot
 document.getElementById('routeBtn').addEventListener('click', async () => {
   if (showRoute && currentRoute) {
@@ -185,7 +235,7 @@ document.getElementById('routeBtn').addEventListener('click', async () => {
           const instructionSteps = document.getElementById('routeInstructions');
           if (instructionSteps) {
             instructionSteps.innerText = instr.text;
-            speakInstruction(instr.text);
+            speakInstructionSafe(instr.text);
           }
         }
       });
@@ -211,7 +261,7 @@ document.getElementById('routeBtn').addEventListener('click', async () => {
         );
 
         if (distance < 10) {
-          speakInstruction(currentInstruction.text);
+          speakInstructionSafe(currentInstruction.text);
           currentDirectionIndex++;
           const instructionSteps = document.getElementById('routeInstructions');
           if (instructionSteps) instructionSteps.innerText = currentInstruction.text;

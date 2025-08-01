@@ -38,10 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         //calendar
         const calendar = flatpickr("#startTime", {
             enableTime: true,
-            dateFormat: "Y-m-d H:i",
             time_24hr: true,
+            altInput: true,
+            altFormat: "d M Y H:i",
+            dateFormat: "Y-m-d H:i",
             defaultDate: new Date(),
-            position: "above"
+            position: "above",
+            allowInput: false
         });
         document.getElementById('calendarIcon').addEventListener('click', () => {
             calendar.open();
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert("Please fill in all fields.");
                 return;
             }
-            
+
             const plateRegex = /^\d{2,3}-[A-Z]{1,2}-\d{1,6}$/;
             if (!plateRegex.test(numberPlate)) {
                 alert("Please enter a valid Irish number plate. (e.g., 24-DL-123456).");
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const formattedPhone = iti.getNumber();
                 await createReservation({ spot: { spotCode }, phoneNumber: formattedPhone, numberPlate, startTime });
-                alert("Reservation created successfully!");
+                alert("Reservation created successfully! Your reservation has a duration of 4 hours after the start time.");
                 await loadUserReservationHistory();
                 //cleaning the form
                 document.getElementById('reservationForm').reset();

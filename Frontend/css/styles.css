@@ -13426,6 +13426,7 @@ button[type="submit"]:hover {
 }
 
 .notification-card {
+  box-sizing: border-box;
   background-color: white;
   border-left: 5px solid #b28cd9;
   padding: 20px;
@@ -13435,6 +13436,7 @@ button[type="submit"]:hover {
   width: 100%;
   max-width: 100%;
   margin-bottom: 16px;
+  word-wrap: break-word;
 }
 
 .notification-card:hover {
@@ -13444,7 +13446,8 @@ button[type="submit"]:hover {
 
 .notification-details {
   flex: 1 1 auto;
-  min-width: 200px;
+  min-width: 0;
+  white-space: normal;
 }
 
 #spotSidebar {
@@ -13961,4 +13964,37 @@ body.check-users-information {
   margin-bottom: 5px;
   color: #b28cd9;
   font-weight: 700;
+}
+
+.informational {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  line-height: 1.2;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-clip: padding-box;
+  z-index: 1000;
+}
+
+.informational label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.color-box {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  flex-shrink: 0;
 }

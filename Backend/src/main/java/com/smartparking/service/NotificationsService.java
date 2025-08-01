@@ -95,11 +95,16 @@ public class NotificationsService {
         notification.setTextMessage(messageFineApplied);
         notification.setFine(DEFAULT_FINE_AMOUNT);
         notification.setIsPaid(false);
-        
+
         // send email notification
-        sendEmailIfNeeded(user, NotificationType.FINE_APPLIED, "Parking Fine Notification - Fine Applied",
-                notification.getTextMessage());
-        return notificationsRepository.save(notification);
+        Notifications saved = notificationsRepository.save(notification);
+        try {
+            sendEmailIfNeeded(user, NotificationType.FINE_APPLIED,
+                    "Parking Fine Notification - Fine Applied", saved.getTextMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return saved;
     }
 
     // personalized notification for user with automatic email sending
@@ -117,6 +122,14 @@ public class NotificationsService {
         if (type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }
+        if (message == null || message.isBlank()) {
+            message = getMessageForNotificationType(type);
+        }
+        if (user != null) {
+            if (user.getUserID() == 0 || usersRepository.findById(user.getUserID()).isEmpty()) {
+                throw new IllegalArgumentException("User does not exist on the database.");
+            }
+        }
         if (reservation != null
                 && notificationSentRepository.existsByReservationAndNotificationType(reservation, type)) {
             return null;
@@ -129,7 +142,11 @@ public class NotificationsService {
         notification.setIsPaid(false);
         Notifications savedNotification = notificationsRepository.save(notification);
 
-        sendEmailIfNeeded(user, type, "Parking Notification", message);
+        try {
+            sendEmailIfNeeded(user, type, "Parking Notification", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (reservation != null) {
             // save the notification as sent
@@ -205,8 +222,16 @@ public class NotificationsService {
 
     // send email if needed based on the notification type and user
     private void sendEmailIfNeeded(Users user, NotificationType type, String subject, String message) {
-        if (sendNotificationEmail(type) && user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+        if (!sendNotificationEmail(type)) {
+            return;
+        }
+        if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+            return;
+        }
+        try {
             setEmailService.sendEmailConfig(user.getEmail(), subject, message);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
