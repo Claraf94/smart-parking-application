@@ -90,7 +90,7 @@ async function renderSpots() {
       parkingSquares.push(spotRectangle);
 
       const invisibleArea = L.circle([latitude, longitude], {
-        radius: 5,
+        radius: 2,
         fillOpacity: 0,
         opacity: 0,
         interactive: true
