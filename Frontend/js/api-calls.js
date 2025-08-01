@@ -54,7 +54,7 @@ async function get(endpoint, headers = {}) {
     }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = extractErrorMessageFromResponse(responseData, response);
+        const errorMessage = extractErrorMessage(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -74,7 +74,7 @@ async function post(endpoint, data, headers = {}) {
     }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = extractErrorMessageFromResponse(responseData, response);
+        const errorMessage = extractErrorMessage(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -97,7 +97,7 @@ async function put(endpoint, data = null, headers = {}) {
     }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = extractErrorMessageFromResponse(responseData, response);
+        const errorMessage = extractErrorMessage(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -116,7 +116,7 @@ async function del(endpoint, headers = {}) {
     }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = extractErrorMessageFromResponse(responseData, response);
+        const errorMessage = extractErrorMessage(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
