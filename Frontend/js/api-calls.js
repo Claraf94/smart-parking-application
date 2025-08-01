@@ -12,16 +12,49 @@ function getAuthHeaders(extraHeaders = {}) {
     };
 }
 
+//function to read the response as a text and convert it to JSON
+async function readResponseAsJson(response) {
+    const responseText = await response.text();
+    try {
+        return JSON.parse(responseText);
+    } catch (error) {
+        return responseText;
+    }
+}
+
+//function to extract error messages from the response
+function extractErrorMessage(responseData, response) {
+    if (!responseData) {
+        return response.statusText || `Error ${response.status}`;
+    }
+
+    if (typeof responseData === 'object') {
+        if (responseData.message) return responseData.message;
+        if (responseData.error) return responseData.error;
+        try {
+            return JSON.stringify(responseData);
+        } catch {
+            return String(responseData);
+        }
+    }
+    return String(responseData);
+}
+
 // Generic helper functions for backend services
 //GET requests
 async function get(endpoint, headers = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers: getAuthHeaders(headers)
-    });
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'GET',
+            headers: getAuthHeaders(headers)
+        });
+    } catch (networkErr) {
+        throw new Error(networkErr.message || 'Network error');
+    }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = responseData.Error || responseData.message || 'Unknown error';
+        const errorMessage = extractErrorMessageFromResponse(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -29,14 +62,19 @@ async function get(endpoint, headers = {}) {
 
 //POST requests
 async function post(endpoint, data, headers = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: getAuthHeaders(headers),
-        body: JSON.stringify(data)
-    });
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers: getAuthHeaders(headers),
+            body: JSON.stringify(data)
+        });
+    } catch (networkErr) {
+        throw new Error(networkErr.message || 'Network error');
+    }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = responseData.Error || responseData.message || 'Unknown error';
+        const errorMessage = extractErrorMessageFromResponse(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -51,10 +89,15 @@ async function put(endpoint, data = null, headers = {}) {
     if (data !== null) {
         options.body = JSON.stringify(data);
     }
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    } catch (networkErr) {
+        throw new Error(networkErr.message || 'Network error');
+    }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = responseData.Error || responseData.message || 'Unknown error';
+        const errorMessage = extractErrorMessageFromResponse(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -62,13 +105,18 @@ async function put(endpoint, data = null, headers = {}) {
 
 //DELETE requests
 async function del(endpoint, headers = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(headers)
-    });
+    let response;
+    try {
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(headers)
+        });
+    } catch (networkErr) {
+        throw new Error(networkErr.message || 'Network error');
+    }
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
-        const errorMessage = responseData.Error || responseData.message || 'Unknown error';
+        const errorMessage = extractErrorMessageFromResponse(responseData, response);
         throw new Error(errorMessage);
     }
     return responseData;
@@ -81,16 +129,6 @@ export {
     put,
     del
 };
-
-//function to read the response as a text and convert it to JSON
-async function readResponseAsJson(response) {
-    const responseText = await response.text();
-    try {
-        return JSON.parse(responseText);
-    } catch (error) {
-        return responseText;
-    }
-}
 
 // --------- AUTHENTICATION AND USER FUNCTIONS ----------
 //authentication function
