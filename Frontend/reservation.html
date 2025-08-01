@@ -30,6 +30,7 @@
                     <li class="nav-item"><a class="nav-link" href="user-dashboard.html">Parking Map</a></li>
                     <li class="nav-item"><a class="nav-link active" href="reservation.html">Reservation</a></li>
                     <li class="nav-item"><a class="nav-link" href="notification.html">Notification</a></li>
+                    <li class="nav-item"><a class="nav-link" href="fines.html">Fine</a></li>
                     <li class="nav-item"><a class="nav-link" href="logout.html">Logout</a></li>
                 </ul>
             </div>
@@ -57,9 +58,15 @@
                                     <input type="tel" class="form-control" id="phoneNumber" required />
                                 </div>
                                 <div class="reservation-form mb-3">
-                                    <label for="numberPlate" class="form-label">Number Plate:</label>
-                                    <input type="text" class="form-control" id="numberPlate"
-                                        placeholder="e.g. 01-D-23456" required />
+                                    <label class="form-label">Number Plate:</label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" class="form-control" id="part1" maxlength="3"
+                                            placeholder="23" required />
+                                        <input type="text" class="form-control" id="part2" maxlength="2"
+                                            placeholder="DL" required />
+                                        <input type="text" class="form-control" id="part3" maxlength="6"
+                                            placeholder="123456" required />
+                                    </div>
                                 </div>
                                 <div class="reservation-form mb-3">
                                     <label for="startTime" class="form-label">Start Time:</label>

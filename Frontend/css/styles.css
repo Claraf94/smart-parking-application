@@ -13236,6 +13236,7 @@ button[type="submit"]:hover {
 }
 
 .reservation-page {
+  padding-top: 80px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -13246,7 +13247,6 @@ button[type="submit"]:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 80px;
 }
 
 .reservation-box {
@@ -13853,7 +13853,7 @@ body.check-users-information {
   color: white;
   border: none;
   padding: 10px 20px;
-  margin-top:10px;
+  margin-top: 10px;
   border-radius: 8px;
   font-weight: 500;
   text-decoration: none;
@@ -13943,4 +13943,22 @@ body.check-users-information {
 .message-box:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.fine-page {
+  min-height: 100vh;
+  padding-top: 80px;
+}
+
+#userFinesList {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.personal-fine {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #b28cd9;
+  font-weight: 700;
 }

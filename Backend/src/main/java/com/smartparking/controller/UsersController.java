@@ -43,6 +43,10 @@ public class UsersController {
                     .badRequest()
                     .body(Map.of("success", false, "message", "Email already registered"));
         }
+        if (usersService.numberPlateExists(user.getNumberPlate())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", "Number plate already registered"));
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Users savedUser = usersService.registerNewUser(user);
         return ResponseEntity.ok(Map.of(

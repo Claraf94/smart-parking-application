@@ -29,6 +29,10 @@ public class UsersService {
         if (usersRepository.existsByEmail(user.getEmail())) {
             throw new ExistentEmailException("This email " + user.getEmail() + " is already registered.");
         }
+        // checking if the user already exists by using the number plate before register it
+        if (usersRepository.existsByNumberPlate(user.getNumberPlate())) {
+            throw new IllegalArgumentException("This number plate " + user.getNumberPlate() + " is already registered.");
+        }
         // saving user to the database
         return usersRepository.save(user);
     }
@@ -44,8 +48,13 @@ public class UsersService {
         return usersRepository.existsByEmail(email);
     }
 
+    public boolean numberPlateExists(String numberPlate) {
+        // check if the number plate exists in the database
+        return usersRepository.existsByNumberPlate(numberPlate);
+    }
+
     public List<Users> findByUserType(UserType userT) {
-        // find a user by its ype
+        // find a user by its type
         return usersRepository.findByUserType(userT);
     }
 

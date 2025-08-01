@@ -192,13 +192,27 @@
                 </div>
                 <div class="tab-pane fade" id="fines" role="tabpanel" aria-labelledby="fines-tab">
                     <div class="filter-section mb-3">
-                        <label for="fineFilter" class="form-label">Filter by status</label>
-                        <select id="fineFilter" class="form-select">
-                            <option value="">All Fines</option>
-                            <option value="unpaid">Unpaid</option>
-                            <option value="paid">Paid</option>
-                        </select>
-                        <button id="applyFineFilterBtn" class="btn btn-primary mt-2">Apply Filter</button>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-6">
+                                <label for="fineUserSelect" class="form-label">User</label>
+                                <select id="fineUserSelect" class="form-select">
+                                    <option value="">All Users</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="fineFilter" class="form-label">Filter by status</label>
+                                <select id="fineFilter" class="form-select">
+                                    <option value="">All Fines</option>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="paid">Paid</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col d-flex justify-content-center">
+                                <button id="applyFineFilterBtn" class="btn btn-primary mt-3">Apply Filter</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="finesList"></div>
                 </div>

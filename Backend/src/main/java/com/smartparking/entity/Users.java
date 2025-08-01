@@ -37,14 +37,18 @@ public class Users {
     @CreationTimestamp
     @Column(name = "created", nullable = false, updatable = false)//created time cannot be null
     private LocalDateTime created; //current time stamp
+    @Column(name = "numberPlate", nullable = false, unique = true, length = 10)
+    @NotBlank(message = "Number plate cannot be blank")
+    private String numberPlate;
 
     //constructor
-    public Users(String email, String password, String firstName, String lastName, UserType userType) {
+    public Users(String email, String password, String firstName, String lastName, UserType userType, String numberPlate) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.userType = userType;
+        this.numberPlate = numberPlate;
     }
 
     //default constructor
@@ -103,6 +107,14 @@ public class Users {
         return created;
     }
 
+    public String getNumberPlate() {
+        return numberPlate;
+    }
+
+    public void setNumberPlate(String numberPlate) {
+        this.numberPlate = numberPlate;
+    }
+
     @Override
     public String toString() {
         return "User details:\n" +
@@ -110,6 +122,7 @@ public class Users {
                 ", Email: " + email +
                 ", Full name: " + firstName + " " + lastName +
                 ", Type: " + userType +
+                ", Number Plate: " + numberPlate +
                 ", Created: " + created; 
     }
 }//users class

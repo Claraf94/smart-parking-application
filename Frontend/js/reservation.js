@@ -1,5 +1,5 @@
 import { getReservableSpots, createReservation, getUserReservationHistory, cancelReservationById } from "./api-calls.js";
-import {checkAuthenticationToken} from "./authentication-help.js";
+import { checkAuthenticationToken } from "./authentication-help.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     checkAuthenticationToken();
@@ -51,7 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('reservationForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const spotCode = document.getElementById('spotCode').value;
-            const numberPlate = document.getElementById('numberPlate').value.trim().toUpperCase();
+            const part1 = document.getElementById('part1').value.trim().toUpperCase();
+            const part2 = document.getElementById('part2').value.trim().toUpperCase();
+            const part3 = document.getElementById('part3').value.trim().toUpperCase();
+            const numberPlate = `${part1}-${part2}-${part3}`;
             const insertedDate = document.getElementById('startTime')._flatpickr.selectedDates[0];
             if (!insertedDate) {
                 alert("Please select a valid date and time.");
@@ -66,7 +69,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert("Please fill in all fields.");
                 return;
             }
-
+            
+            const plateRegex = /^\d{2,3}-[A-Z]{1,2}-\d{1,6}$/;
+            if (!plateRegex.test(numberPlate)) {
+                alert("Please enter a valid Irish number plate. (e.g., 24-DL-123456).");
+                return;
+            }
             if (!iti.isValidNumber()) {
                 alert("Please enter a valid phone number.");
                 return;

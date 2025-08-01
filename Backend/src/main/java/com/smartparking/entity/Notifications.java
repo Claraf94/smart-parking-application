@@ -1,9 +1,8 @@
 package com.smartparking.entity;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smartparking.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +15,7 @@ public class Notifications {
     //declare variables
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "notificationID")
     private int notificationID; //unique identifier for the notification
     @ManyToOne //indicates a many-to-one relationship with the Users entity
     @JoinColumn(name = "userID", nullable = true)
@@ -55,10 +55,12 @@ public class Notifications {
     public Notifications(){}
 
     //getters and setters
+    @JsonProperty("notificationId")
     public int getNotificationID() {
         return notificationID;
     }
 
+    @JsonProperty("notificationId")
     public void setNotificationID(int notificationID) {
         this.notificationID = notificationID;
     }
@@ -103,10 +105,12 @@ public class Notifications {
         this.fine = fine;
     }
 
-    public Boolean getIsPaid(){
+    @JsonProperty("isPaid")
+    public Boolean isPaid(){
         return isPaid;
     }
 
+    @JsonProperty("isPaid")
     public void setIsPaid(Boolean isPaid){
         this.isPaid = isPaid;
     }

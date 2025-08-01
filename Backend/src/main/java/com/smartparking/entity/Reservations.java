@@ -40,7 +40,7 @@ public class Reservations {
     private String phoneNumber;
     @Column(name = "numberPlate", nullable = false)
     @NotBlank(message = "Number plate cannot be blank")
-    @Pattern(regexp = "^\\d{2,3}-[A-Z]{1,2}-\\d{1,5}$", message = "Invalid number plate format.") // Ireland number                                                                     // plate format
+    @Pattern(regexp = "^\\d{2,3}-[A-Z]{1,2}-\\d{1,6}$", message = "Invalid number plate format.") // Ireland number                                                                     // plate format
     private String numberPlate;
     @Column(name = "startTime", nullable = false) // start, end and reservedAt times cannot be null
     @NotNull(message = "Start time cannot be null")

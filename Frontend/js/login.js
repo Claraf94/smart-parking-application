@@ -6,6 +6,11 @@ function isEmailValid(email) {
     return emailVerification.test(email);
 }
 
+//simple function to check the number plate format
+function isIrishPlateValid(plate) {
+    const plateRegex = /^\d{2,3}-[A-Za-z]{1,2}-\d{1,6}$/;
+    return plateRegex.test(plate);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     //login user
@@ -67,12 +72,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
+            const part1 = document.getElementById('part1').value.trim().toUpperCase();
+            const part2 = document.getElementById('part2').value.trim().toUpperCase();
+            const part3 = document.getElementById('part3').value.trim().toUpperCase();
+            const numberPlate = `${part1}-${part2}-${part3}`;
 
-            if (!firstName || !lastName || !email || !password) {
+            if (!firstName || !lastName || !email || !numberPlate || !password) {
                 alert("Please complete all fields.");
                 return;
             }
 
+            // Validate number plate format
+            if (!isIrishPlateValid(numberPlate)) {
+                alert("Please enter a valid Irish number plate. (e.g., 24-DL-123456).");
+                return;
+            }
+            // Validate email format
             if (!isEmailValid(email)) {
                 alert("Please enter a valid email address.");
                 return;
@@ -83,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     firstName,
                     lastName,
                     email,
+                    numberPlate,
                     password
                 };
                 const response = await register(user);

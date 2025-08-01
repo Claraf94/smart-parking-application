@@ -68,6 +68,14 @@ async function renderSpots() {
       }).addTo(map);
       parkingSquares.push(spotRectangle);
 
+      const invisibleArea = L.circle([latitude, longitude], {
+        radius:5,
+        fillOpacity: 0,
+        opacity: 0,
+        interactive: true
+      }).addTo(map);
+      dragSpots.push(invisibleArea);
+
       //label properties with the spot code to help to identify which spot it is
       const label = L.marker([centerLatitude, centerLongitude], {
         icon: L.divIcon({
@@ -89,7 +97,8 @@ async function renderSpots() {
         </div>`;
 
       spotRectangle.bindPopup(popup);
-      spotRectangle.on('click', function (event) {
+      invisibleArea.bindPopup(spotRectangle.getPopup());
+      invisibleArea.on('click', (event) => {
         spotRectangle.openPopup(event.latlng);
       });
     });

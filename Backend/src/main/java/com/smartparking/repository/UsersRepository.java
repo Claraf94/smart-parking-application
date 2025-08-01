@@ -15,4 +15,6 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     boolean existsByEmail(String email);
     //find a user by type
     List<Users> findByUserType(UserType userType);
+    //verify if a number plate exists before registering a new user
+    boolean existsByNumberPlate(String numberPlate);
 }//users repository class

@@ -1,4 +1,4 @@
-import { getSpotsOverview, getAllUsers, getCurrentParkedUsers, getAllReservations, getAllNotifications, getParkingTrackHistory, get, loadSpots, getReservableSpots, getUnpaidFines, payFine } from './api-calls.js';
+import { getSpotsOverview, getAllUsers, getCurrentParkedUsers, getAllReservations, getAllNotifications, getParkingTrackHistory, get, loadSpots, getReservableSpots, getUnpaidFines, payFine, createNotification, createFineNotification } from './api-calls.js';
 
 let reservableChartInstance = null;
 let regularChartInstance = null;
@@ -226,9 +226,103 @@ async function loadParkingHistory(userId = '', spotCode = '') {
     }).join('');
 }
 
+async function loadFines(filterStatus = '', userId = '') {
+    const finesContainer = document.getElementById('finesList');
+    if (!finesContainer) return;
+
+    let fines = [];
+    if (filterStatus === 'unpaid') {
+        fines = await getUnpaidFines();
+    } else {
+        const notifications = await getAllNotifications();
+        fines = notifications.filter(n => n.notificationType === 'FINE_APPLIED');
+        if (filterStatus === 'paid') {
+            fines = fines.filter(f => f.isPaid === true);
+        }
+    }
+
+    if (userId) {
+        fines = fines.filter(f => f.user?.userID == userId);
+    }
+    
+    if (Array.isArray(fines)) {
+        fines.sort((a, b) => {
+            const dateA = a.created ? new Date(a.created) : new Date(0);
+            const dateB = b.created ? new Date(b.created) : new Date(0);
+            return dateB - dateA;
+        });
+    }
+
+    if (!Array.isArray(fines) || fines.length === 0) {
+        finesContainer.innerHTML = '<p class="text-muted">No fines found.</p>';
+        return;
+    }
+
+    finesContainer.innerHTML = fines.map(fine => {
+        const userIdDisplay = fine.user?.userID || 'N/A';
+        const amount = fine.fine || 0;
+        const isPaid = !!fine.isPaid;
+        // prioridade para o campo camelCase que o backend retorna
+        const notificationIdRaw = fine.notificationId ?? fine.notificationID ?? fine.id;
+        const notificationId = notificationIdRaw != null ? notificationIdRaw : '';
+        if (!notificationId) {
+            console.warn('Fine without a recognizable ID (button disabled):', fine);
+        }
+        const statusText = isPaid ? 'Paid' : 'Unpaid';
+        return `<div class="message-box">
+                    <div><strong>User ID:</strong> ${userIdDisplay}</div>
+                    <div><strong>Amount:</strong> $${amount}</div>
+                    <div><strong>Status:</strong> ${statusText}</div>
+                    <button class="btn btn-sm btn-success pay-fine-btn" data-id="${notificationId}" ${isPaid || !notificationId ? 'disabled' : ''}>
+                        ${isPaid ? 'Paid' : 'Mark as Paid'}
+                    </button>
+                </div>`;
+    }).join('');
+
+    if (finesContainer._fineClickHandler) {
+        finesContainer.removeEventListener('click', finesContainer._fineClickHandler);
+    }
+
+    function handlePayFineClick(event) {
+        const button = event.target.closest('.pay-fine-btn');
+        if (!button) return;
+        if (button.disabled) return;
+        const rawId = button.getAttribute('data-id');
+        if (!rawId || rawId === 'undefined') {
+            alert('Notification ID not found for this fine.');
+            console.error('Invalid ID on button:', rawId, button);
+            return;
+        }
+        const id = !isNaN(rawId) ? parseInt(rawId, 10) : rawId;
+        button.disabled = true;
+        const previousText = button.textContent;
+        button.textContent = 'Processing...';
+        payFine(id).then(async () => {
+            button.textContent = 'Paid';
+            const filterStatusLocal = document.getElementById('fineFilter')?.value;
+            const selectedUserId = document.getElementById('fineUserSelect')?.value || '';
+            await loadFines(filterStatusLocal, selectedUserId);
+        }).catch(async (error) => {
+            button.disabled = false;
+            button.textContent = previousText || 'Mark as Paid';
+            if (error.response) {
+                const text = await error.response.text();
+                alert('Failed to mark fine as paid: ' + text);
+            } else {
+                alert('Failed to mark fine as paid: ' + (error.message || 'Unknown error'));
+            }
+        });
+    }
+
+    finesContainer.addEventListener('click', handlePayFineClick);
+    finesContainer._fineClickHandler = handlePayFineClick;
+}
+
+
 async function populateFiltersSearch() {
     const users = await getAllUsers();
 
+    //parking filters
     const spots = await loadSpots();
     const userFilterParking = document.getElementById('userFilterParking');
     const spotFilterParking = document.getElementById('spotFilterParking');
@@ -245,6 +339,7 @@ async function populateFiltersSearch() {
         });
     }
 
+    //reservation filters
     const reservableSpots = await getReservableSpots();
     const userFilterReservation = document.getElementById('userFilterReservation');
     const spotFilterReservation = document.getElementById('spotFilterReservation');
@@ -268,50 +363,25 @@ async function populateFiltersSearch() {
             spotFilterReservation.innerHTML += `<option value="${spot.spotCode}">${spot.spotCode} - ${spot.locationDescription || ''}</option>`;
         });
     }
+
+    //fine filters
+    const fineUserSelect = document.getElementById('fineUserSelect');
+    if (fineUserSelect) {
+        fineUserSelect.innerHTML = '<option value="">All Users</option>';
+        users.forEach(user => {
+            fineUserSelect.innerHTML += `<option value="${user.userID}">${user.firstName} ${user.lastName} - ID: ${user.userID}</option>`;
+        });
+    }
 }
 
-async function loadFines(filterStatus = '') {
-    const finesContainer = document.getElementById('finesList');
-    if (!finesContainer) return;
-    let fines = [];
-    if (filterStatus === 'unpaid') {
-        fines = await getUnpaidFines();
-    } else {
-        fines = await getAllNotifications();
-        fines = fines.filter(fine => fine.notificationType === 'FINE');
-        if (filterStatus === 'paid') {
-            fines = fines.filter(fine => fine.isPaid === true);
-        }
-    }
-    if (fines.length === 0) {
-        finesContainer.innerHTML = '<p class="text-muted">No fines found.</p>';
-        return;
-    }
 
-    finesContainer.innerHTML = fines.map(fine => `
-    <div class="message-box">
-      <div><strong>User ID:</strong> ${fine.user?.userID || 'N/A'}</div>
-      <div><strong>Amount:</strong> $${fine.fine || 0}</div>
-      <div><strong>Status:</strong> ${fine.isPaid ? 'Paid' : 'Unpaid'}</div>
-      <button class="btn btn-sm btn-success pay-fine-btn" data-id="${fine.notificationID}" ${fine.isPaid ? 'disabled' : ''}>
-        Mark as Paid
-      </button>
-    </div>
-  `).join('');
-
-    finesContainer.querySelectorAll('.pay-fine-btn').forEach(button => {
-        button.addEventListener('click', async () => {
-            const id = button.getAttribute('data-id');
-            try {
-                await payFine(id);
-                button.disabled = true;
-                button.textContent = 'Paid';
-                const filterStatus = document.getElementById('fineFilter').value;
-                await loadFines(filterStatus);
-            } catch (error) {
-                alert('Failed to mark fine as paid. Try again.');
-            }
-        });
+async function getUsersForNotification() {
+    const users = await getAllUsers();
+    const notificationUserSelect = document.getElementById('notificationUserSelect');
+    if (!notificationUserSelect) return;
+    notificationUserSelect.innerHTML = '<option value="">All Users</option>';
+    users.forEach(user => {
+        notificationUserSelect.innerHTML += `<option value="${user.userID}">${user.firstName} ${user.lastName} - ID: ${user.userID}</option>`;
     });
 }
 
@@ -323,6 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadReservationsHistory();
     await loadNotificationsHistory();
     await loadFines();
+    await getUsersForNotification();
 
     const applyParkingFilterBtn = document.getElementById('applyParkingFilterBtn');
     if (applyParkingFilterBtn) {
@@ -347,7 +418,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (applyFineFilterBtn) {
         applyFineFilterBtn.addEventListener('click', async () => {
             const filterStatus = document.getElementById('fineFilter').value;
-            await loadFines(filterStatus);
+            const userId = document.getElementById('fineUserSelect')?.value || '';
+            await loadFines(filterStatus, userId);
+        });
+    }
+
+    const createNotificationForm = document.getElementById('createNotificationForm');
+    if (createNotificationForm) {
+        createNotificationForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const userId = document.getElementById('notificationUserSelect').value;
+            const type = document.getElementById('notificationType').value;
+            const message = document.getElementById('notificationMessage').value;
+
+            if (!type || !message) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            try {
+                let response;
+                if (type === 'FINE_APPLIED') {
+                    if (!userId) {
+                        alert('To send a notification related to fines, you must select a user.');
+                        return;
+                    }
+                    response = await createFineNotification({ userID: parseInt(userId) });
+                } else {
+                    const dataToSend = {
+                        notificationType: type,
+                        textMessage: message,
+                        user: userId ? { userID: parseInt(userId) } : null
+                    };
+                    response = await createNotification(dataToSend);
+                }
+
+                alert('Notification sent successfully!');
+                const modalElement = document.getElementById('createNotificationModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) modal.hide();
+                createNotificationForm.reset();
+                await loadNotificationsHistory();
+            } catch (error) {
+                alert(`Error creating notification: ${error.message || error}`);
+            }
         });
     }
 

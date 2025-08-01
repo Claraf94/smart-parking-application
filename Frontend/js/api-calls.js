@@ -1,5 +1,5 @@
-//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+//const API_BASE_URL = "http://localhost:8080";
 
 // ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
 //function to add authentication headers to the request
@@ -43,12 +43,15 @@ async function post(endpoint, data, headers = {}) {
 }
 
 //PUT requests
-async function put(endpoint, data, headers = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+async function put(endpoint, data = null, headers = {}) {
+    const options = {
         method: 'PUT',
-        headers: getAuthHeaders(headers),
-        body: JSON.stringify(data)
-    });
+        headers: getAuthHeaders(headers)
+    };
+    if (data !== null) {
+        options.body = JSON.stringify(data);
+    }
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     const responseData = await readResponseAsJson(response);
     if (!response.ok) {
         const errorMessage = responseData.Error || responseData.message || 'Unknown error';
@@ -213,6 +216,12 @@ export async function getNotifications() {
     return await get('/notifications/user');
 }
 
+// -------- FINE FUNCTIONS ----------
+//get all personal fines function
+export async function getUserFines() {
+    return await get('/notifications/personal-fines');
+}
+
 // --------- ADMIN FUNCTIONS ----------
 //creat a new parking spot function
 export async function createParkingSpot(spotData) {
@@ -226,9 +235,9 @@ export async function createParkingSpot(spotData) {
 
 //update spot information function
 export async function updateSpotInfo(spotId, spotData) {
-    try{
+    try {
         return await put(`/spots/update/${spotId}`, spotData);
-    }catch (error) {
+    } catch (error) {
         console.error('Error updating spot information:', error);
         throw error;
     }
@@ -251,17 +260,17 @@ export async function getSpotsOverview() {
     const statusOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
     const reservableSpotsOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
     const regularSpotsOverview = { EMPTY: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
-    for(const spot of spots){
+    for (const spot of spots) {
         const status = spot.status;
         const isReservable = spot.isReservable;
         statusOverview[status] = (statusOverview[status] || 0) + 1;
-        if(isReservable) {
+        if (isReservable) {
             reservableSpotsOverview[status] = (reservableSpotsOverview[status] || 0) + 1;
-        }else{
+        } else {
             regularSpotsOverview[status] = (regularSpotsOverview[status] || 0) + 1;
         }
     }
-    return{overall, statusOverview, reservableSpotsOverview, regularSpotsOverview};
+    return { overall, statusOverview, reservableSpotsOverview, regularSpotsOverview };
 }
 
 //get all users function
@@ -307,6 +316,17 @@ export async function getUnpaidFines() {
 }
 
 //mark fine as paid function
-export async function payFine(notificationID) {
-    return await put(`/notifications/${notificationID}/pay`);
+export async function payFine(notificationId) {
+    return await put(`/notifications/${notificationId}/pay`);
 }
+
+//create a new notification function
+export async function createNotification(notificationData) {
+    return await post('/notifications/create', notificationData);
+}
+
+//create a fine notification function
+export async function createFineNotification(user) {
+    return await post('/notifications/fine', user);
+}
+
