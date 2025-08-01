@@ -13969,7 +13969,7 @@ body.check-users-information {
 
 .informational {
   position: fixed;
-  top: 28%;
+  top: 40%;
   right: 10px;
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.35);
