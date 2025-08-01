@@ -95,7 +95,7 @@ public class ReservationsService {
         Users user = saveReservation.getUser();
         if (user != null) {
             notificationsService.createNotificationForUser(user, NotificationType.SPOT_RESERVED,
-                    "Reservation successfully created. Your reservation has a duration of 4 hours after the start time.",
+                    "Reservation successfully created.",
                     saveReservation);
         }
         spotsService.updateSpotStatus(existingSpot.get(), SpotStatus.RESERVED);
