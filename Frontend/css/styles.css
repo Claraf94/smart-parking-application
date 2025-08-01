@@ -13998,3 +13998,34 @@ body.check-users-information {
   border-radius: 3px;
   flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+  .informational {
+    font-size: 10px;
+    padding: 6px 8px;
+    max-width: 160px;
+    right: 6px;
+    gap: 4px;
+  }
+
+  .informational strong {
+    font-size: 11px;
+  }
+
+  .informational label {
+    gap: 4px;
+    margin: 2px 0;
+  }
+
+  .color-box {
+    width: 10px;
+    height: 10px;
+  }
+
+  .label-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+}
