@@ -136,10 +136,22 @@ public class ReservationsService {
 
         Users user = res.getUser();
         if (user != null) {
+            String bodyMessage = String.format(
+                    "Hello %s,%n%n" +
+                            "Your reservation has been successfully cancelled.%n%n" +
+                            "Spot: %s – %s%n" +
+                            "Date and Time: %s at %s%n%n" +
+                            "Thank you for using ParkTime!",
+                    user.getFirstName(),
+                    res.getSpot().getSpotCode(),
+                    res.getSpot().getLocationDescription(),
+                    res.getStartTime().toLocalDate(),
+                    res.getStartTime().toLocalTime().withSecond(0).withNano(0));
+
             notificationsService.createNotificationForUser(
                     user,
                     NotificationType.RESERVATION_CANCELLED,
-                    "Your reservation has been cancelled.",
+                    bodyMessage,
                     res);
         }
         List<Reservations> activeReservations = reservationsRepository.findBySpotAndReservationStatus(

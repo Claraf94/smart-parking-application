@@ -1,5 +1,5 @@
-const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
-//const API_BASE_URL = "http://localhost:8080";
+//const API_BASE_URL = "https://smartparking-backend-byfwgng0eehza3ch.francecentral-01.azurewebsites.net";
+const API_BASE_URL = "http://localhost:8080";
 
 // ------- API HELPER METHODS: TOKEN, GET, POST, PUT, DELETE ------
 //function to add authentication headers to the request
