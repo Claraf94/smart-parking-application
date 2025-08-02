@@ -143,7 +143,34 @@ public class NotificationsService {
         Notifications savedNotification = notificationsRepository.save(notification);
 
         try {
-            sendEmailIfNeeded(user, type, "Parking Notification", message);
+            String subject = "Parking Notification";
+            String bodyMessage = message;
+            if (type == NotificationType.SPOT_RESERVED && reservation != null) {
+                subject = "Reservation confirmed at ParkTime";
+                bodyMessage = """
+                        Hello %s,
+                        Your reservation has been successfully confirmed!
+
+                        Details:
+                        ---------------
+                        Reserved Spot: %s - %s
+                        Date and Time: %s at %s
+                        License Plate: %s
+                        Phone: %s
+
+                        Thank you for using ParkTime!
+                        """.formatted(
+                        user.getFirstName(),
+                        reservation.getSpot().getSpotCode(),
+                        reservation.getSpot().getLocationDescription(),
+                        reservation.getStartTime().toLocalDate(),
+                        reservation.getStartTime().toLocalTime().withSecond(0).withNano(0),
+                        reservation.getNumberPlate(),
+                        reservation.getPhoneNumber());
+            }
+
+            sendEmailIfNeeded(user, type, subject, bodyMessage);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,21 +187,15 @@ public class NotificationsService {
 
     // mark a fine as paid
     public Notifications markAsPaid(int notificationId) {
-        System.out.println(">> markAsPaid chamado com id: " + notificationId);
         List<Notifications> all = notificationsRepository.findAll();
-        System.out.println(">> Todas notificações (IDs e isPaid):");
         all.forEach(n -> System.out.println("   id=" + n.getNotificationID() + ", isPaid=" + n.isPaid()));
 
         Optional<Notifications> optNotification = notificationsRepository.findById(notificationId);
         if (optNotification.isEmpty()) {
-            System.out.println(">> findById retornou vazio para id: " + notificationId);
             throw new IllegalArgumentException("Notification not found with the provided id.");
         }
 
         Notifications notification = optNotification.get();
-        System.out.println(">> Notificação encontrada: id=" + notification.getNotificationID() + ", fine="
-                + notification.getFine() + ", isPaid=" + notification.isPaid());
-
         if (notification.getFine() != null && notification.getFine().compareTo(BigDecimal.ZERO) > 0) {
             notification.setIsPaid(true);
             return notificationsRepository.save(notification);

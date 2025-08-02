@@ -1,7 +1,6 @@
 package com.smartparking.service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,8 +47,9 @@ public class ReservationsService {
         if (existingSpot.isEmpty()) {
             throw new IllegalArgumentException("Invalid spot code.");
         }
-        LocalDateTime newStartTime = reservation.getStartTime();
-        LocalDateTime proposedEndTime = newStartTime.plusHours(4);
+
+        LocalDateTime startTime = reservation.getStartTime();
+        LocalDateTime endTime = startTime.plusHours(4);
         // verifies if there is an active reservation at the spot that conflicts with a
         // new one
         List<Reservations> activeReservations = reservationsRepository
@@ -58,14 +58,13 @@ public class ReservationsService {
             LocalDateTime resStart = res.getStartTime();
             LocalDateTime resEnd = resStart.plusHours(4);
             // checking if overlaps with an exiting one
-            boolean overlaps = newStartTime.isBefore(resEnd) && resStart.isBefore(proposedEndTime);
-            if (!overlaps) {
+            boolean overlaps = startTime.isBefore(resEnd) && resStart.isBefore(endTime);
+            if (!overlaps)
                 continue;
-            }
 
-            if (resStart.isAfter(newStartTime)) {
-                proposedEndTime = resStart;
-                long durationMin = Duration.between(newStartTime, proposedEndTime).toMinutes();
+            if (resStart.isAfter(startTime)) {
+                endTime = resStart;
+                long durationMin = Duration.between(startTime, endTime).toMinutes();
                 // if the duration is less than 45 minutes, the system will not allow the
                 if (durationMin < 45) {
                     throw new IllegalArgumentException(
@@ -77,7 +76,8 @@ public class ReservationsService {
                     "The reservation could not be completed because the time conflicts with an existing one.");
         }
         // if the reservation does not conflict, save it
-        reservation.setEndTime(proposedEndTime);
+        reservation.setStartTime(startTime);
+        reservation.setEndTime(endTime);
         reservation.setSpot(existingSpot.get());
         reservation.setReservationStatus(ReservationStatus.ACTIVE);
         Reservations saveReservation = reservationsRepository.save(reservation);

@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     startTime
                 });
 
-                alert("Reservation created successfully! Your reservation has a duration of 4 hours after the start time.");
+                alert("Reservation created successfully!");
                 await loadUserReservationHistory();
                 //cleaning the form
                 document.getElementById('reservationForm').reset();
