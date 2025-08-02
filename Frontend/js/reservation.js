@@ -35,21 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             spotSelect.appendChild(select);
         });
 
-        //calendar
-        const calendar = flatpickr("#startTime", {
-            enableTime: true,
-            time_24hr: true,
-            altInput: true,
-            altFormat: "d M Y H:i",
-            dateFormat: "Y-m-d H:i",
-            defaultDate: new Date(),
-            position: "above",
-            allowInput: false
-        });
-        document.getElementById('calendarIcon').addEventListener('click', () => {
-            calendar.open();
-        });
-
         //create reservation
         document.getElementById('reservationForm').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -58,17 +43,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const part2 = document.getElementById('part2').value.trim().toUpperCase();
             const part3 = document.getElementById('part3').value.trim().toUpperCase();
             const numberPlate = `${part1}-${part2}-${part3}`;
-            const insertedDate = document.getElementById('startTime')._flatpickr.selectedDates[0];
-            if (!insertedDate) {
-                alert("Please select a valid date and time.");
-                return;
-            }
-            const startTime = insertedDate.getFullYear() + '-' +
-                String(insertedDate.getMonth() + 1).padStart(2, '0') + '-' +
-                String(insertedDate.getDate()).padStart(2, '0') + 'T' +
-                String(insertedDate.getHours()).padStart(2, '0') + ':' +
-                String(insertedDate.getMinutes()).padStart(2, '0');
-            if (!spotCode || !phoneNumberValue.value.trim() || !numberPlate || !startTime) {
+            const reservationDate = document.getElementById('reservationDate').value; // yyyy-MM-dd
+            const reservationTime = document.getElementById('reservationTime').value; // HH:mm
+            if (!spotCode || !phoneNumberValue.value.trim() || !numberPlate || !reservationDate || !reservationTime) {
                 alert("Please fill in all fields.");
                 return;
             }
@@ -83,14 +60,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            const now = new Date();
+            const selectedDateTime = new Date(`${reservationDate}T${reservationTime}`);
+            if (selectedDateTime <= now) {
+                alert("Reservation date and time must be in the future.");
+                return;
+            }
+
             try {
                 const formattedPhone = iti.getNumber();
-                await createReservation({ spot: { spotCode }, phoneNumber: formattedPhone, numberPlate, startTime });
+                const startTime = `${reservationDate}T${reservationTime}:00`;
+
+                await createReservation({
+                    spot: { spotCode },
+                    phoneNumber: formattedPhone,
+                    numberPlate,
+                    startTime
+                });
+
                 alert("Reservation created successfully! Your reservation has a duration of 4 hours after the start time.");
                 await loadUserReservationHistory();
                 //cleaning the form
                 document.getElementById('reservationForm').reset();
-                calendar.setDate(new Date());
                 iti.setNumber("");
             } catch (error) {
                 alert(error.message || "Reservation could not be created. Please try again.");
