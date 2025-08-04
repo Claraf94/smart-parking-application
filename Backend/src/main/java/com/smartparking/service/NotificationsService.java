@@ -119,6 +119,10 @@ public class NotificationsService {
 
     public Notifications createNotificationForUser(Users user, NotificationType type, String message,
             Reservations reservation) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("User must not be null.");
+        }
         if (type == null) {
             throw new IllegalArgumentException("Notification type must not be null.");
         }

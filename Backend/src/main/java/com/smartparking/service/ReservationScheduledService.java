@@ -41,9 +41,28 @@ public class ReservationScheduledService {
             if (!notificationSentRepository.existsByReservationAndNotificationType(res,
                     NotificationType.RESERVATION_EXPIRING)) {
                 // Create a notification for the user if it hasn't been sent yet
-                Notifications notification = notificationsService.createNotificationForUser(res.getUser(),
+                String message = """
+                        Hello %s,
+
+                        Just a reminder: your reservation is about to expire in less than 10 minutes.
+
+                        Details:
+                        ---------------
+                        Spot: %s - %s
+                        Ends at: %s %s
+
+                        Thank you for using ParkTime!
+                        """.formatted(
+                        res.getUser().getFirstName(),
+                        res.getSpot().getSpotCode(),
+                        res.getSpot().getLocationDescription(),
+                        res.getEndTime().toLocalDate(),
+                        res.getEndTime().toLocalTime().withSecond(0).withNano(0));
+                Notifications notification = notificationsService.createNotificationForUser(
+                        res.getUser(),
                         NotificationType.RESERVATION_EXPIRING,
-                        "Your reservation for spot " + res.getSpot().getSpotsID() + " is about to expire.", res);
+                        message,
+                        res);
                 if (notification != null) {
                     System.out.println("Notification sent for expiring reservation: " + res.getReservationID());
                 }
@@ -56,9 +75,30 @@ public class ReservationScheduledService {
             if (!notificationSentRepository.existsByReservationAndNotificationType(res,
                     NotificationType.RESERVATION_EXPIRED)) {
                 // Create a notification for the user if it hasn't been sent yet
-                Notifications notification = notificationsService.createNotificationForUser(res.getUser(),
+                String message = """
+                        Hello %s,
+
+                        Your reservation has expired.
+
+                        Details:
+                        ---------------
+                        Spot: %s - %s
+                        Ended at: %s %s
+
+                        The spot is now available again.
+
+                        Thank you for using ParkTime!
+                        """.formatted(
+                        res.getUser().getFirstName(),
+                        res.getSpot().getSpotCode(),
+                        res.getSpot().getLocationDescription(),
+                        res.getEndTime().toLocalDate(),
+                        res.getEndTime().toLocalTime().withSecond(0).withNano(0));
+                Notifications notification = notificationsService.createNotificationForUser(
+                        res.getUser(),
                         NotificationType.RESERVATION_EXPIRED,
-                        "Your reservation for spot " + res.getSpot().getSpotsID() + " has expired.", res);
+                        message,
+                        res);
                 if (notification != null) {
                     System.out.println("Notification sent for expired reservation: " + res.getReservationID());
                 }
@@ -80,10 +120,30 @@ public class ReservationScheduledService {
                 spotsRepository.save(spot);
                 if (!notificationSentRepository.existsByReservationAndNotificationType(res,
                         NotificationType.RESERVATION_CANCELLED)) {
-                    Notifications notification = notificationsService.createNotificationForUser(res.getUser(),
+                    String message = """
+                            Hello %s,
+
+                            Your reservation was cancelled because no check-in was made within 15 minutes of the scheduled start time.
+
+                            Details:
+                            ---------------
+                            Spot: %s - %s
+                            Scheduled: %s %s
+
+                            Please ensure timely check-ins for future reservations.
+
+                            Thank you for using ParkTime!
+                            """
+                            .formatted(
+                                    res.getUser().getFirstName(),
+                                    res.getSpot().getSpotCode(),
+                                    res.getSpot().getLocationDescription(),
+                                    res.getStartTime().toLocalDate(),
+                                    res.getStartTime().toLocalTime().withSecond(0).withNano(0));
+                    Notifications notification = notificationsService.createNotificationForUser(
+                            res.getUser(),
                             NotificationType.RESERVATION_CANCELLED,
-                            "Your reservation for spot " + res.getSpot().getSpotsID()
-                                    + " has been cancelled due to no-show within the time.",
+                            message,
                             res);
                     if (notification != null) {
                         System.out.println(

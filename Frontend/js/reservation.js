@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const part2 = document.getElementById('part2').value.trim().toUpperCase();
             const part3 = document.getElementById('part3').value.trim().toUpperCase();
             const numberPlate = `${part1}-${part2}-${part3}`;
-            const reservationDate = document.getElementById('reservationDate').value; // yyyy-MM-dd
-            const reservationTime = document.getElementById('reservationTime').value; // HH:mm
+            const reservationDate = document.getElementById('reservationDate').value;
+            const reservationTime = document.getElementById('reservationTime').value; 
             if (!spotCode || !phoneNumberValue.value.trim() || !numberPlate || !reservationDate || !reservationTime) {
                 alert("Please fill in all fields.");
                 return;
