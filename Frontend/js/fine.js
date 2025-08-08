@@ -8,7 +8,7 @@ async function displayFines() {
     try {
         fines = await getUserFines();
     } catch (error) {
-        let msg = 'Erro ao carregar suas multas.';
+        let msg = 'Fines could not be found.';
         if (error.message) msg += ' ' + error.message;
         finesContent.innerHTML = `<p class="text-danger">${msg}</p>`;
         return;
@@ -19,7 +19,7 @@ async function displayFines() {
         return;
     }
 
-    // ordenar da mais nova para a mais velha por created
+    
     fines.sort((a, b) => {
         const dateA = a.created ? new Date(a.created) : new Date(0);
         const dateB = b.created ? new Date(b.created) : new Date(0);

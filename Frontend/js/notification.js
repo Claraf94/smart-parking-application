@@ -16,7 +16,6 @@ async function loadNotifications() {
             return;
         }
 
-        // Mostrar da mais recente para mais antiga
         userNotifications.reverse().forEach(notification => {
             const div = document.createElement('div');
             div.className = 'notification-item';
